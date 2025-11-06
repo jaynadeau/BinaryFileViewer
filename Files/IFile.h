@@ -5,7 +5,7 @@
 #ifndef BINARYFILEVIEWER_IFILE_H
 #define BINARYFILEVIEWER_IFILE_H
 
-namespace qti::aisw::bfv::files {
+namespace bfv::files {
 
 }
 class IFile {

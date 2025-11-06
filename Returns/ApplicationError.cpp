@@ -6,7 +6,7 @@
 
 #include <utility>
 
-namespace qti::aisw::bfv::returns {
+namespace bfv::returns {
 
     ApplicationError::ApplicationError(int errorNumber, std::string errorMessage)
     {
@@ -14,4 +14,4 @@ namespace qti::aisw::bfv::returns {
         mErrorMessage = std::move(errorMessage);
     }
 
-}   // qti::aisw::bfv::utils::returns
+}   // bfv::utils::returns

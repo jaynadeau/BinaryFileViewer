@@ -8,7 +8,7 @@
 #include <iostream>
 #include <string>
 
-using namespace qti::aisw::bfv;
+using namespace bfv;
 
 int main(int argc, char* argv[])
 {
@@ -19,13 +19,13 @@ int main(int argc, char* argv[])
     parser.addArgument("--output_filename", false, false, "Path to the output text file to convert the binary file to.", utils::ArgParser::TYPE::STRING);
     parser.addArgument("--output_type", true, false, "The format to output/interpret the binary file as. Can be one of [UINT8_T, UINT16_T, UINT32_T, INT8_T, INT16_T, INT32_T, FLOAT32, HEX, CHAR, BINARY]", utils::ArgParser::TYPE::STRING);
     try {
-        utils::ArgParser::Arguments args = parser.Parse(argc, argv);
+        const utils::ArgParser::Arguments args = parser.Parse(argc, argv);
         for(const auto& arg : args)
         {
             // get the std::any value...need helper method or methods...
-            std::cout << arg.name << " " << static_cast<int>(arg.type)
+            std::cout << arg.name << " " << static_cast<int>(arg.type) << std::endl;
 
-            << std::get<static_cast<int>(arg.type)>(arg.value) <<
+            // << std::get<static_cast<int>(arg.type)>(arg.value) <<
             std::cout << std::endl;
         }
     }

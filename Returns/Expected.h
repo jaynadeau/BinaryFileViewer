@@ -128,7 +128,7 @@ struct is_trivially_copy_constructible<std::vector<T, A>> : std::false_type {};
 #define TL_EXPECTED_11_CONSTEXPR constexpr
 #endif
 
-namespace qti::aisw::bfv::returns {
+namespace bfv::returns {
     template <class T, class E> class expected;
 
 #ifndef TL_MONOSTATE_INPLACE_MUTEX

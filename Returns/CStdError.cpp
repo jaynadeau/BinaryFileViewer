@@ -7,15 +7,10 @@
 #include <cerrno>
 // Use the POSIX version of strerror_r instead of the GNU-specific version...
 #define __USE_XOPEN2K 1
-#ifdef __USE_GNU
 #undef __USE_GNU
 #include <string.h>
-#define __USE_GNU 1
-#else
-#include <string.h>
-#endif
 
-namespace qti::aisw::bfv::returns {
+namespace bfv::returns {
 
     CStdError::CStdError()
     : ErrorBase(errno)
@@ -38,4 +33,4 @@ namespace qti::aisw::bfv::returns {
         }
     }
 
-}   // namespace qti::aisw::bfv::utils::returns
+}   // namespace bfv::utils::returns

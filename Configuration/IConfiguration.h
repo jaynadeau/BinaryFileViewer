@@ -7,7 +7,7 @@
 
 #include <memory>
 
-namespace qti::aisw::bfv::configuration {
+namespace bfv::configuration {
 
     class IConfiguration;
     using ConfigurationPtr = std::shared_ptr<IConfiguration>;
@@ -18,6 +18,6 @@ namespace qti::aisw::bfv::configuration {
         virtual ConfigurationPtr getConfiguration() = 0;
         virtual ~IConfiguration() = default;
     };
-}   // qti::aisw::bfv::configuration
+}   // bfv::configuration
 
 #endif //BINARYFILEVIEWER_ICONFIGURATION_H

@@ -9,7 +9,7 @@
 
 #include <iostream>
 
-namespace qti::aisw::bfv::returns {
+namespace bfv::returns {
 
     class ErrorBase : public IError
     {
@@ -18,7 +18,7 @@ namespace qti::aisw::bfv::returns {
         explicit ErrorBase(int errorNumber);
         ErrorBase(int errorNumber, std::string errorMessage);
         ErrorBase(const ErrorBase& other) = default;
-        ~ErrorBase() override {std::cout << "~ErrorBase\n";};
+        ~ErrorBase() override = default;
 
         [[nodiscard]] std::string getErrorAsString() const override;
         [[nodiscard]] std::string getErrorMessage() const override;
@@ -28,6 +28,6 @@ namespace qti::aisw::bfv::returns {
         std::string mErrorMessage;
     };
 
-}   // namespace qti::aisw::bfv::utils::returns
+}   // namespace bfv::utils::returns
 
 #endif //BINARYFILEVIEWER_ERRORBASE_H

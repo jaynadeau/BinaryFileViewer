@@ -15,7 +15,7 @@
 #include "../Returns/Expected.h"
 #include "../Returns/ParseError.h"
 
-namespace qti::aisw::bfv::utils {
+namespace bfv::utils {
 
     class ArgParser final : public SingletonBase<ArgParser>
     {
@@ -84,9 +84,9 @@ namespace qti::aisw::bfv::utils {
         Arguments mExpectedArguments;
         returns::expected<Arguments, returns::ParseError> mValidatedArguments;
 
-        returns::expected<Arguments, returns::ParseError> getRequiredArguments(const std::vector<std::string> &argumentsToValidate);
+        [[nodiscard]] returns::expected<Arguments, returns::ParseError> getRequiredArguments(const std::vector<std::string> &argumentsToValidate) const;
     };
 
-}   // qti::aisw::bfv::utils
+}   // bfv::utils
 
 #endif //BINARYFILEVIEWER_ARGPARSER_H

@@ -5,7 +5,7 @@
 #ifndef BINARYFILEVIEWER_SINGLETONBASE_H
 #define BINARYFILEVIEWER_SINGLETONBASE_H
 
-namespace qti::aisw::bfv::utils {
+namespace bfv::utils {
 
     template <class T>
     class SingletonBase
@@ -25,6 +25,6 @@ namespace qti::aisw::bfv::utils {
     protected:
         SingletonBase() = default;
     };
-}   // namespace qti::aisw::bfv::utils
+}   // namespace bfv::utils
 
 #endif //BINARYFILEVIEWER_SINGLETONBASE_H

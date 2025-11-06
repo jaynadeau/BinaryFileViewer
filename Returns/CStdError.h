@@ -9,7 +9,7 @@
 
 #include <iostream>
 
-namespace qti::aisw::bfv::returns {
+namespace bfv::returns {
 
     class CStdError : public ErrorBase
     {
@@ -23,6 +23,6 @@ namespace qti::aisw::bfv::returns {
         static const int TMP_BUF_SIZE = 256;
     };
 
-}   // namespace qti::aisw::bfv::utils::returns
+}   // namespace bfv::utils::returns
 
 #endif //BINARYFILEVIEWER_CSTDERROR_H

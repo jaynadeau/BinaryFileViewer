@@ -10,7 +10,7 @@
 #include <list>
 #include <string>
 
-namespace qti::aisw::bfv::configuration {
+namespace bfv::configuration {
 
     class BfvConfiguration : public IConfiguration {
     public:
@@ -20,6 +20,6 @@ namespace qti::aisw::bfv::configuration {
         std::string mOutputFilename;
     };
 
-}   // qti::aisw::bfv::configuration
+}   // bfv::configuration
 
 #endif //BINARYFILEVIEWER_BFVCONFIGURATION_H

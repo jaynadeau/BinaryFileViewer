@@ -9,7 +9,7 @@
 
 #include <string>
 
-namespace qti::aisw::bfv::returns {
+namespace bfv::returns {
 
     class ApplicationError : public ErrorBase
     {
@@ -19,6 +19,6 @@ namespace qti::aisw::bfv::returns {
         ~ApplicationError() override = default;
     };
 
-}   // qti::aisw::bfv::returns
+}   // bfv::returns
 
 #endif //BINARYFILEVIEWER_APPLICATIONERROR_H

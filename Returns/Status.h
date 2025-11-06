@@ -11,7 +11,7 @@
 #include <string>
 #include <optional>
 
-namespace qti::aisw::bfv::returns {
+namespace bfv::returns {
 
     template <typename ResultType = void>
     class Status
@@ -48,11 +48,7 @@ namespace qti::aisw::bfv::returns {
             swap(*this, other);
         }
 
-        Status(const Status& other)
-            : mError{other.mError}
-            , mResult{other.mResult}
-            , mMessage{other.mMessage}
-        {}
+        Status(const Status& other) = default;
 
         explicit Status(const std::optional<ResultType>& other)
             : mError{std::nullopt}
@@ -88,7 +84,7 @@ namespace qti::aisw::bfv::returns {
             return *this;
         }
 
-        friend void swap(Status& lhs, Status& rhs)
+        friend void swap(Status& lhs, Status& rhs) noexcept
         {
           using std::swap;  // enable ADL
           swap(lhs.mResult, rhs.mResult);
@@ -170,6 +166,6 @@ namespace qti::aisw::bfv::returns {
         std::string mMessage;
     };
 
-} // namespace qti::aisw::bfv::utils::returns
+} // namespace bfv::returns
 
 #endif //BINARYFILEVIEWER_STATUS_H

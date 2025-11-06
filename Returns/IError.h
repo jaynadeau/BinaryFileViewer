@@ -8,18 +8,18 @@
 #include <iostream>
 #include <string>
 
-namespace qti::aisw::bfv::returns {
+namespace bfv::returns {
 
     class IError
     {
     public:
-        virtual ~IError() {std::cout <<"~IError()\n";};
+        virtual ~IError() = default;
 
         [[nodiscard]] virtual std::string getErrorAsString() const = 0;
         [[nodiscard]] virtual std::string getErrorMessage() const = 0;
         [[nodiscard]] virtual int getErrorNumber() const = 0;
     };
 
-}   // namespace qti::aisw::bfv::utils::returns
+}   // namespace bfv::utils::returns
 
 #endif //BINARYFILEVIEWER_IERROR_H

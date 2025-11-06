@@ -7,14 +7,14 @@
 #include <sstream>
 #include <utility>
 
-namespace qti::aisw::bfv::returns {
+namespace bfv::returns {
 
-    ErrorBase::ErrorBase(int errorNumber)
+    ErrorBase::ErrorBase(const int errorNumber)
     : mErrorNumber{errorNumber}
     , mErrorMessage{}
     {}
 
-    ErrorBase::ErrorBase(int errorNumber, std::string errorMessage)
+    ErrorBase::ErrorBase(const int errorNumber, std::string errorMessage)
         : mErrorNumber{errorNumber}
         , mErrorMessage{std::move(errorMessage)}
     {}
@@ -33,4 +33,4 @@ namespace qti::aisw::bfv::returns {
         return mErrorNumber;
     }
 
-}   // namespace qti::aisw::bfv::utils::returns
+}   // namespace bfv::utils::returns

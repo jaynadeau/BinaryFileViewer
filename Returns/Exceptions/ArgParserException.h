@@ -7,7 +7,7 @@
 
 #include <stdexcept>
 
-namespace qti::aisw::bfv::returns::exceptions {
+namespace bfv::returns::exceptions {
 
     class ArgParserException : public std::logic_error {
             using std::logic_error::logic_error;

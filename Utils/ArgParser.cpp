@@ -10,7 +10,7 @@
 
 #include "../Returns/Exceptions/ArgParserException.h"
 
-namespace qti::aisw::bfv::utils {
+namespace bfv::utils {
 
     ArgParser::Argument::Argument(std::string name, bool isRequired, bool isFlag, std::string description, ArgParser::TYPE type)
     : name{std::move(name)}
@@ -29,25 +29,23 @@ namespace qti::aisw::bfv::utils {
         mOriginalArguments.reserve(mArgumentCount);
         for(int argCount = 0; argCount < mArgumentCount; ++argCount)
         {
-            mOriginalArguments.emplace_back(std::string{argv[argCount]});
+            mOriginalArguments.emplace_back(argv[argCount]);
         }
         mValidatedArguments = validateArguments(mOriginalArguments);
         if(!mValidatedArguments) {
-            std::cout << "throwing exception\n";
             throw returns::exceptions::ArgParserException(mValidatedArguments.error().getErrorAsString());
         }
         return mValidatedArguments.value();
     }
 
     returns::expected<ArgParser::Arguments, returns::ParseError> ArgParser::validateArguments(const std::vector<std::string>& argumentsToValidate) {
-        returns::expected<Arguments, returns::ParseError> requiredArguments = getRequiredArguments(argumentsToValidate);
-        if(requiredArguments)
+        if(returns::expected<Arguments, returns::ParseError> requiredArguments = getRequiredArguments(argumentsToValidate))
             return validateArgumentTypes(requiredArguments.value());
         else
             return requiredArguments;
     }
 
-    returns::expected<ArgParser::Arguments, returns::ParseError> ArgParser::getRequiredArguments(const std::vector<std::string> &argumentsToValidate) {
+    returns::expected<ArgParser::Arguments, returns::ParseError> ArgParser::getRequiredArguments(const std::vector<std::string> &argumentsToValidate) const {
         Arguments requiredArguments;
         for(const auto& expectedArgument : mExpectedArguments) {
             // foundArg has the right type based on the vector, I would like to do the same with the argument
@@ -58,7 +56,8 @@ namespace qti::aisw::bfv::utils {
             }
             else {
                 if(expectedArgument.isRequired) {
-                    return returns::unexpected{returns::MISSING_REQUIRED_ARGUMENT};
+                    // return returns::unexpected{returns::MISSING_REQUIRED_ARGUMENT};
+                    return returns::unexpected{returns::ParseError{returns::ParseError::TYPE::MISSING_REQD_ARG, expectedArgument.name}};
                 }
             }
         }

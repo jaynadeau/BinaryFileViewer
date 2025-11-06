@@ -7,7 +7,7 @@
 
 #include "Utils/SingletonBase.h"
 
-namespace qti::aisw::bfv {
+namespace bfv {
 
     class Application final : public utils::SingletonBase<Application>
     {
@@ -26,6 +26,6 @@ namespace qti::aisw::bfv {
             Application() = default;
             friend class SingletonBase<Application>;
         };
-}   // namespace qti::aisw::bfv
+}   // namespace bfv
 
 #endif //BINARYFILEVIEWER_APPLICATION_H

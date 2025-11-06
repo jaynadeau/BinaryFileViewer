@@ -5,7 +5,7 @@
 
 #include "Application.h"
 
-namespace qti::aisw::bfv {
+namespace bfv {
 
     void Application::Start() {
         std::cout << "Starting application..." << std::endl;
@@ -19,4 +19,4 @@ namespace qti::aisw::bfv {
         Application::getInstance().Stop();
         Application::getInstance().Start();
     }
-}   // namespace qti::aisw::bfv
+}   // namespace bfv
