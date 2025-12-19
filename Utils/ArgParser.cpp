@@ -12,7 +12,7 @@
 
 namespace bfv::utils {
 
-    ArgParser::Argument::Argument(std::string name, bool isRequired, bool isFlag, std::string description, ArgParser::TYPE type)
+    ArgParser::Argument::Argument(std::string name, bool isRequired, const bool isFlag, std::string description, const ArgParser::TYPE type)
     : name{std::move(name)}
     , isRequired{isRequired}
     , isFlag{isFlag}
@@ -24,7 +24,7 @@ namespace bfv::utils {
         mExpectedArguments.emplace_back(std::move(name), isRequired, isFlag, std::move(description), type);
     }
 
-    ArgParser::Arguments ArgParser::Parse(int argc, char **argv) {
+    ArgParser::Arguments ArgParser::Parse(const int argc, char **argv) {
         mArgumentCount = argc;
         mOriginalArguments.reserve(mArgumentCount);
         for(int argCount = 0; argCount < mArgumentCount; ++argCount)
@@ -50,13 +50,11 @@ namespace bfv::utils {
         for(const auto& expectedArgument : mExpectedArguments) {
             // foundArg has the right type based on the vector, I would like to do the same with the argument
             // NOTE: use the fact that arguments start with -- and values do not
-            auto foundArg = std::find(argumentsToValidate.begin(), argumentsToValidate.end(), expectedArgument.name);
-            if(foundArg != argumentsToValidate.end()) {
+            if(auto foundArg = std::find(argumentsToValidate.begin(), argumentsToValidate.end(), expectedArgument.name); foundArg != argumentsToValidate.end()) {
                 requiredArguments.emplace_back(expectedArgument);
             }
             else {
                 if(expectedArgument.isRequired) {
-                    // return returns::unexpected{returns::MISSING_REQUIRED_ARGUMENT};
                     return returns::unexpected{returns::ParseError{returns::ParseError::TYPE::MISSING_REQD_ARG, expectedArgument.name}};
                 }
             }
@@ -111,10 +109,12 @@ namespace bfv::utils {
                         }
                     } catch(const std::invalid_argument& ia) {
                         // could not convert argument to specified type, incompatible type
-                        return returns::unexpected{returns::INCOMPATIBLE_TYPE};
+                        return returns::unexpected{returns::ParseError{returns::ParseError::TYPE::INCOMPATIBLE_TYPE, requiredArgument.name}};
+                        // return returns::unexpected{returns::INCOMPATIBLE_TYPE};
                     } catch(const std::out_of_range& oor) {
                         // the value of the argument does not match the type specified, range error
-                        return returns::unexpected{returns::RANGE_ERROR};
+                        return returns::unexpected{returns::ParseError{returns::ParseError::TYPE::RANGE_ERROR, requiredArgument.name}};
+                        // return returns::unexpected{returns::RANGE_ERROR};
                     }
                 }
             }
