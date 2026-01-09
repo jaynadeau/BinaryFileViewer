@@ -5,7 +5,7 @@
 
 #include "ApplicationManager.h"
 
-namespace bfv {
+namespace utils {
 
     ApplicationManager::ApplicationManager(utils::IApplication& application)
         : mApplication(&application)
@@ -32,4 +32,4 @@ namespace bfv {
     }
 
 
-}   // namespace bfv
+}

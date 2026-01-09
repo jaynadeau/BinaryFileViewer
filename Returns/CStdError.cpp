@@ -10,7 +10,7 @@
 #undef __USE_GNU
 #include <string.h>
 
-namespace bfv::returns {
+namespace returns {
 
     CStdError::CStdError()
     : ErrorBase(errno)
@@ -33,4 +33,4 @@ namespace bfv::returns {
         }
     }
 
-}   // namespace bfv::utils::returns
+}

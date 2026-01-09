@@ -8,7 +8,7 @@
 #include <iostream>
 #include <string>
 
-namespace bfv::returns {
+namespace returns {
 
     class IError
     {
@@ -20,6 +20,6 @@ namespace bfv::returns {
         [[nodiscard]] virtual int getErrorNumber() const = 0;
     };
 
-}   // namespace bfv::utils::returns
+}
 
 #endif //BINARYFILEVIEWER_IERROR_H

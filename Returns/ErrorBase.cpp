@@ -7,7 +7,7 @@
 #include <sstream>
 #include <utility>
 
-namespace bfv::returns {
+namespace returns {
 
     ErrorBase::ErrorBase(const int errorNumber)
     : mErrorNumber{errorNumber}
@@ -33,4 +33,4 @@ namespace bfv::returns {
         return mErrorNumber;
     }
 
-}   // namespace bfv::utils::returns
+}

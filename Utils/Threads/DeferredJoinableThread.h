@@ -12,7 +12,7 @@
 #include <stdexcept>
 #include <tuple>
 
-namespace bfv::utils::threads {
+namespace utils::threads {
 
     /**
      * @brief A thread wrapper that defers thread execution until explicitly started.
@@ -32,8 +32,8 @@ namespace bfv::utils::threads {
         DeferredJoinableThread() : mStarted{false} {}
         DeferredJoinableThread(DeferredJoinableThread&& other) noexcept
             : mTask{std::move(other.mTask)}
-              , mStarted{other.mStarted}
-              , mThread{std::move(other.mThread)}
+            , mStarted{other.mStarted}
+            , mThread{std::move(other.mThread)}
         {
             other.mStarted = false;
         }
@@ -183,21 +183,6 @@ namespace bfv::utils::threads {
         }
 
     private:
-        // /**
-        //  * @brief Helper method to create the thread by unpacking stored arguments.
-        //  *
-        //  * Uses index_sequence to unpack the tuple of arguments.
-        //  */
-        // template<std::size_t... Is>
-        // JoinableThread createThread(std::index_sequence<Is...>) {
-        //     return JoinableThread(
-        //         [callable = std::move(mCallable),
-        //          args = std::move(mArgs)]() mutable {
-        //             std::apply(std::move(callable), std::move(args));
-        //         }
-        //     );
-        // }
-
         std::function<void()> mTask;
         bool mStarted;
         JoinableThread mThread;

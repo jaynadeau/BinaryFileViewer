@@ -6,7 +6,7 @@
 
 #include <utility>
 
-namespace bfv::returns {
+namespace returns {
 
     ApplicationError::ApplicationError(int errorNumber, std::string errorMessage)
     {
@@ -14,4 +14,4 @@ namespace bfv::returns {
         mErrorMessage = std::move(errorMessage);
     }
 
-}   // bfv::utils::returns
+}

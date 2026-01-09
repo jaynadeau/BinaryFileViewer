@@ -6,10 +6,10 @@
 #define BINARYFILEVIEWER_BINARYFILEVIEWERAPPLICATION_H
 
 #include "Utils/IApplication.h"
-
-#include <thread>
+#include "Utils/Threads/DeferredJoinableThread.h"
 
 namespace bfv {
+
     class BinaryFileViewerApplication : public utils::IApplication {
     public:
         void Start() override;
@@ -18,7 +18,7 @@ namespace bfv {
         void Pause() override;
     private:
         // std::atomic<bool>& mStopFlag;
-        std::thread mMainThread;
+        utils::threads::DeferredJoinableThread mMainThread;
         void ApplicationMain(void* arg, std::atomic<bool>& stopFlag) override;
     };
 }

@@ -11,7 +11,7 @@
 #include <string>
 #include <optional>
 
-namespace bfv::returns {
+namespace returns {
 
     template <typename ResultType = void>
     class Status
@@ -166,6 +166,6 @@ namespace bfv::returns {
         std::string mMessage;
     };
 
-} // namespace bfv::returns
+}
 
 #endif //BINARYFILEVIEWER_STATUS_H

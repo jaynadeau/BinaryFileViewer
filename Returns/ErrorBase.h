@@ -9,7 +9,7 @@
 
 #include <iostream>
 
-namespace bfv::returns {
+namespace returns {
 
     class ErrorBase : public IError
     {
@@ -28,6 +28,6 @@ namespace bfv::returns {
         std::string mErrorMessage;
     };
 
-}   // namespace bfv::utils::returns
+}
 
 #endif //BINARYFILEVIEWER_ERRORBASE_H

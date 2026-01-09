@@ -5,7 +5,7 @@
 #ifndef BINARYFILEVIEWER_IFILE_H
 #define BINARYFILEVIEWER_IFILE_H
 
-namespace bfv::files {
+namespace files {
 
 }
 class IFile {

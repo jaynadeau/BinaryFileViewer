@@ -4,19 +4,45 @@
 
 #include "JoinableThread.h"
 
-namespace bfv::utils::threads {
+namespace utils::threads {
 
-    // template<typename Callable, typename... Args>
-    // JoinableThread::JoinableThread(Callable&& callable, Args&&... args)
-    // {
-    //     mWorker = std::bind(std::forward<Callable>(callable), std::forward<Args>(args)...);
-    //     mThread = std::thread(mWorker);
-    // }
-    //
-    // JoinableThread::~JoinableThread() {
-    //     if (mThread.joinable()) {
-    //         mThread.join();
-    //     }
-    // }
+    JoinableThread::JoinableThread(std::function<void()> func)
+    : mThread{std::move(func)}
+    {}
+
+    JoinableThread::~JoinableThread() noexcept {
+        if (mThread.joinable()) {
+            mThread.join();
+        }
+    }
+
+    void JoinableThread::detach() {
+        if (mThread.joinable()) {
+            mThread.detach();
+        }
+    }
+
+    void JoinableThread::join() {
+        if (mThread.joinable()) {
+            mThread.join();
+        }
+    }
+
+    bool JoinableThread::joinable() const {
+        return mThread.joinable();
+    }
+
+    // Add thread ID access
+    std::thread::id JoinableThread::getId() const {
+        return mThread.get_id();
+    }
+
+    void JoinableThread::swap(JoinableThread& other) noexcept {
+        mThread.swap(other.mThread);
+    }
+
+    std::thread::native_handle_type JoinableThread::getNativeHandle() {
+        return mThread.native_handle();
+    }
 
 }

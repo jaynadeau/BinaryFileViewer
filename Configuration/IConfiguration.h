@@ -7,7 +7,7 @@
 
 #include <memory>
 
-namespace bfv::configuration {
+namespace configuration {
 
     class IConfiguration;
     using ConfigurationPtr = std::shared_ptr<IConfiguration>;
@@ -18,6 +18,6 @@ namespace bfv::configuration {
         virtual ConfigurationPtr getConfiguration() = 0;
         virtual ~IConfiguration() = default;
     };
-}   // bfv::configuration
+}
 
 #endif //BINARYFILEVIEWER_ICONFIGURATION_H

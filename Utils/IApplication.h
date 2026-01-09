@@ -2,12 +2,13 @@
 // Created by jnadeau on 11/11/2025.
 //
 
-#ifndef BINARYFILEVIEWER_IAPPLICATION_H
-#define BINARYFILEVIEWER_IAPPLICATION_H
+#ifndef UTILS_IAPPLICATION_H
+#define UTILS_IAPPLICATION_H
 
 #include <atomic>
 
-namespace bfv::utils {
+namespace utils {
+
     enum class APPLICATION_STATE {
         STARTED,
         STOPPED,
@@ -29,4 +30,4 @@ namespace bfv::utils {
     };
 }
 
-#endif //BINARYFILEVIEWER_IAPPLICATION_H
+#endif // UTILS_IAPPLICATION_H

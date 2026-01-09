@@ -2,15 +2,15 @@
 // Created by jnadeau on 10/4/2022.
 //
 
-#ifndef BINARYFILEVIEWER_APPLICATION_MANAGER_H
-#define BINARYFILEVIEWER_APPLICATION_MANAGER_H
+#ifndef UTILS_APPLICATION_MANAGER_H
+#define UTILS_APPLICATION_MANAGER_H
 
 #include "Utils/IApplication.h"
 #include "Utils/SingletonBase.h"
 
 #include <memory>
 
-namespace bfv {
+namespace utils {
 
     class ApplicationManager final : public utils::SingletonBase<ApplicationManager>, public utils::IApplication
     {
@@ -34,6 +34,6 @@ namespace bfv {
             using ApplicationPtr = std::unique_ptr<IApplication>;
             ApplicationPtr mApplication;
         };
-}   // namespace bfv
+}
 
-#endif //BINARYFILEVIEWER_APPLICATION_MANAGER_H
+#endif // UTILS_APPLICATION_MANAGER_H

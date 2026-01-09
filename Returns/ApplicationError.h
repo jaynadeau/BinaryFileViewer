@@ -9,7 +9,7 @@
 
 #include <string>
 
-namespace bfv::returns {
+namespace returns {
 
     class ApplicationError : public ErrorBase
     {
@@ -19,6 +19,6 @@ namespace bfv::returns {
         ~ApplicationError() override = default;
     };
 
-}   // bfv::returns
+}
 
 #endif //BINARYFILEVIEWER_APPLICATIONERROR_H

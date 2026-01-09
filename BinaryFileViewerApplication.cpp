@@ -5,6 +5,7 @@
 #include "BinaryFileViewerApplication.h"
 
 namespace bfv {
+
     void BinaryFileViewerApplication::Start() {
         // mMainThread = std::thread(&BinaryFileViewerApplication::ApplicationMain, this, std::ref(mStopFlag));
     }

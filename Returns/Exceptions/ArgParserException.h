@@ -7,12 +7,12 @@
 
 #include <stdexcept>
 
-namespace bfv::returns::exceptions {
+namespace returns::exceptions {
 
     class ArgParserException : public std::logic_error {
             using std::logic_error::logic_error;
         };
 
-    } // exceptions
+}
 
 #endif //BINARYFILEVIEWER_ARGPARSEREXCEPTION_H

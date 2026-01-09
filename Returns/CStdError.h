@@ -9,7 +9,7 @@
 
 #include <iostream>
 
-namespace bfv::returns {
+namespace returns {
 
     class CStdError : public ErrorBase
     {

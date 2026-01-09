@@ -2,10 +2,10 @@
 // Created by jnadeau on 11/16/2022.
 //
 
-#ifndef BINARYFILEVIEWER_SINGLETONBASE_H
-#define BINARYFILEVIEWER_SINGLETONBASE_H
+#ifndef UTILS_SINGLETON_BASE_H
+#define UTILS_SINGLETON_BASE_H
 
-namespace bfv::utils {
+namespace utils {
 
     template <class T>
     class SingletonBase
@@ -27,4 +27,4 @@ namespace bfv::utils {
     };
 }   // namespace bfv::utils
 
-#endif //BINARYFILEVIEWER_SINGLETONBASE_H
+#endif // UTILS_SINGLETON_BASE_H
