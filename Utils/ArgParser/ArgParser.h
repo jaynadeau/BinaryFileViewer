@@ -20,7 +20,7 @@
 #include <vector>
 
 #include "../../Returns/Expected.h"
-#include "../../Returns/ParseError.h"
+#include "ParseError.h"
 
 namespace utils {
 

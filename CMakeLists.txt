@@ -22,8 +22,8 @@ add_executable(BinaryFileViewer
         Configuration/IConfiguration.h
         Configuration/BfvConfiguration.cpp
         Configuration/BfvConfiguration.h
-        Returns/ParseError.h
-        Returns/ParseError.cpp
+        Utils/ArgParser/ParseError.h
+        Utils/ArgParser/ParseError.cpp
         Returns/Expected.h
         Returns/Exceptions/ArgParserException.h
         Utils/IApplication.h
