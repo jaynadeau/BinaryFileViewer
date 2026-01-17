@@ -5,122 +5,151 @@
 #include "ArgParser.h"
 
 #include <algorithm>
+#include <cctype>
 #include <iostream>
-#include <utility>
 
 #include "../../Returns/Exceptions/ArgParserException.h"
 
 namespace utils {
 
-    ArgParser::Argument::Argument(std::string name, bool isRequired, const bool isFlag, std::string description, const ArgParser::TYPE type)
-    : name{std::move(name)}
+    ArgParser::Argument::Argument(std::string_view name, bool isRequired, const bool isFlag, std::string_view description, const ArgParser::TYPE type)
+    : name{name}
     , isRequired{isRequired}
     , isFlag{isFlag}
-    , description{std::move(description)}
+    , description{description}
     , type{type}
-    , value{}
     {}
 
-    void ArgParser::addArgument(std::string name, bool isRequired, bool isFlag, std::string description, ArgParser::TYPE type) {
-        mExpectedArguments.emplace_back(std::move(name), isRequired, isFlag, std::move(description), type);
+    void ArgParser::addArgument(std::string_view name, bool isRequired, bool isFlag, std::string_view description, ArgParser::TYPE type) {
+        mUserSpecifiedArguments.emplace_back(std::string(name), isRequired, isFlag, std::string(description), type);
     }
 
-    ArgParser::Arguments ArgParser::Parse(const int argc, char **argv) {
+    std::vector<std::string> ArgParser::parseCommandLineArgs(const std::string& arg) {
+        std::vector<std::string> parsedArgs;
+        if (const auto it = arg.find_first_of("="); it != std::string::npos) {
+            std::string key   = arg.substr(0, it);
+            std::string value = arg.substr(it + 1);
+            parsedArgs.emplace_back(key);
+            parsedArgs.emplace_back(value);
+        }
+        else {
+            parsedArgs.emplace_back(arg);
+        }
+        return parsedArgs;
+    }
+
+    ArgParser::ExpectedArguments ArgParser::Parse(const int argc, char **argv) {
         mArgumentCount = argc;
         mOriginalArguments.reserve(mArgumentCount);
-        for(int argCount = 0; argCount < mArgumentCount; ++argCount)
+        for(int argCount = 1; argCount < mArgumentCount; ++argCount)
         {
-            mOriginalArguments.emplace_back(argv[argCount]);
+            const std::string arg = argv[argCount];
+            std::vector<std::string> parsedArgs = parseCommandLineArgs(arg);
+            mOriginalArguments.insert(mOriginalArguments.end(), parsedArgs.begin(), parsedArgs.end());
         }
         mValidatedArguments = validateArguments(mOriginalArguments);
         if(!mValidatedArguments) {
-            throw returns::exceptions::ArgParserException(mValidatedArguments.error().getErrorAsString());
+            return returns::unexpected(mValidatedArguments.error());
         }
-        return mValidatedArguments.value();
+        return mValidatedArguments;
     }
 
-    returns::expected<ArgParser::Arguments, returns::ParseError> ArgParser::validateArguments(const std::vector<std::string>& argumentsToValidate) {
-        if(returns::expected<Arguments, returns::ParseError> requiredArguments = getRequiredArguments(argumentsToValidate))
-            return validateArgumentTypes(requiredArguments.value());
-        else
-            return requiredArguments;
+    ArgParser::ExpectedArguments ArgParser::validateArguments(const std::vector<std::string>& argumentsToValidate) {
+        Arguments validatedArguments;
+        for(auto& specifiedArgument : mUserSpecifiedArguments) {
+            if(auto foundArg = std::find(argumentsToValidate.begin(), argumentsToValidate.end(), specifiedArgument.name); foundArg != argumentsToValidate.end()) {
+                if (ExpectedArgument argument = validateArgumentType(foundArg, specifiedArgument); argument.has_value()) {
+                    validatedArguments.emplace_back(argument.value());
+                }
+                else {
+                    return returns::unexpected(argument.error());
+                }
+            }
+            else if (specifiedArgument.isRequired) {
+                return returns::unexpected{returns::ParseError{returns::ParseError::TYPE::MISSING_REQD_ARG, specifiedArgument.name}};
+            }
+        }
+        return validatedArguments;
     }
 
-    returns::expected<ArgParser::Arguments, returns::ParseError> ArgParser::getRequiredArguments(const std::vector<std::string> &argumentsToValidate) const {
-        Arguments requiredArguments;
-        for(const auto& expectedArgument : mExpectedArguments) {
-            // foundArg has the right type based on the vector, I would like to do the same with the argument
-            // NOTE: use the fact that arguments start with -- and values do not
-            if(auto foundArg = std::find(argumentsToValidate.begin(), argumentsToValidate.end(), expectedArgument.name); foundArg != argumentsToValidate.end()) {
-                requiredArguments.emplace_back(expectedArgument);
+    bool ArgParser::looksLikeAFlag(std::vector<std::string>::const_iterator &iterator, ArgParser::Argument &argument) {
+        if (iterator->rfind("--", 0) == 0) { // Starts with "--"
+            return true;
+        }
+        else if (iterator->rfind("-", 0) == 0) {
+            if (argument.type == ArgParser::TYPE::STRING) {
+                return true;
             }
             else {
-                if(expectedArgument.isRequired) {
-                    return returns::unexpected{returns::ParseError{returns::ParseError::TYPE::MISSING_REQD_ARG, expectedArgument.name}};
+                if (iterator->size() > 1 && !std::isdigit(static_cast<unsigned char>((*iterator)[1])) && (*iterator)[1] != '.') {
+                    return true;
                 }
             }
         }
-        return requiredArguments;
+
+        return false;
     }
 
-    returns::expected<ArgParser::Arguments, returns::ParseError> ArgParser::validateArgumentTypes(Arguments& requiredArguments) {
-        for(auto& requiredArgument : requiredArguments) {
-            auto foundArg = std::find(mOriginalArguments.begin(), mOriginalArguments.end(), requiredArgument.name);
-            if(!requiredArgument.isFlag) {
-                // the next argument is actually the current arguments value when not a flag argument
-                if(++foundArg != mOriginalArguments.end()) {
-                    try {
-                        switch (requiredArgument.type) {
-                            case ArgParser::TYPE::STRING:
-                                requiredArgument.value = std::string{*foundArg};
-                                break;
-                            case ArgParser::TYPE::INT8:
-                                requiredArgument.value = static_cast<std::int8_t>(std::stoi(*foundArg));
-                                break;
-                            case ArgParser::TYPE::INT16:
-                                requiredArgument.value = static_cast<std::int16_t>(std::stoi(*foundArg));
-                                break;
-                            case ArgParser::TYPE::INT32:
-                                requiredArgument.value = static_cast<std::int32_t>(std::stol(*foundArg));
-                                break;
-                            case ArgParser::TYPE::INT64:
-                                requiredArgument.value = static_cast<std::int64_t>(std::stoll(*foundArg));
-                                break;
-                            case ArgParser::TYPE::UINT8:
-                                requiredArgument.value = static_cast<std::uint8_t>(std::stoul(*foundArg));
-                                break;
-                            case ArgParser::TYPE::UINT16:
-                                requiredArgument.value = static_cast<std::uint16_t>(std::stoul(*foundArg));
-                                break;
-                            case ArgParser::TYPE::UINT32:
-                                requiredArgument.value = static_cast<std::uint32_t>(std::stoul(*foundArg));
-                                break;
-                            case ArgParser::TYPE::UINT64:
-                                requiredArgument.value = static_cast<std::uint64_t>(std::stoull(*foundArg));
-                                break;
-                            case ArgParser::TYPE::FLOAT:
-                                requiredArgument.value = static_cast<float>(std::stof(*foundArg));
-                                break;
-                            case ArgParser::TYPE::DOUBLE:
-                                requiredArgument.value = static_cast<double>(std::stod(*foundArg));
-                                break;
-                            case ArgParser::TYPE::LONG_DOUBLE:
-                                requiredArgument.value = static_cast<long double>(std::stold(*foundArg));
-                                break;
-                        }
-                    } catch(const std::invalid_argument& ia) {
-                        // could not convert argument to specified type, incompatible type
-                        return returns::unexpected{returns::ParseError{returns::ParseError::TYPE::INCOMPATIBLE_TYPE, requiredArgument.name}};
-                        // return returns::unexpected{returns::INCOMPATIBLE_TYPE};
-                    } catch(const std::out_of_range& oor) {
-                        // the value of the argument does not match the type specified, range error
-                        return returns::unexpected{returns::ParseError{returns::ParseError::TYPE::RANGE_ERROR, requiredArgument.name}};
-                        // return returns::unexpected{returns::RANGE_ERROR};
-                    }
+    ArgParser::ExpectedArgument ArgParser::validateArgumentType(std::vector<std::string>::const_iterator& iterator, Argument& argument) {
+        // argument is not a flag and so should have a value in the next element...
+        if(!argument.isFlag) {
+            // increment the iterator to get the value
+            if(++iterator == mOriginalArguments.end()) {
+                return returns::unexpected{returns::ParseError{returns::ParseError::TYPE::MISSING_VALUE, argument.name}};
+            }
+
+            // check to see if the value looks like a flag...also checking for negative values as well
+            if (looksLikeAFlag(iterator, argument)) {
+                return returns::unexpected{returns::ParseError{returns::ParseError::TYPE::MISSING_VALUE, argument.name}};
+            }
+
+            try {
+                switch (argument.type) {
+                    case ArgParser::TYPE::STRING:
+                        argument.value = std::string{*iterator};
+                        break;
+                    case ArgParser::TYPE::INT8:
+                        argument.value = static_cast<std::int8_t>(std::stoi(*iterator));
+                        break;
+                    case ArgParser::TYPE::INT16:
+                        argument.value = static_cast<std::int16_t>(std::stoi(*iterator));
+                        break;
+                    case ArgParser::TYPE::INT32:
+                        argument.value = static_cast<std::int32_t>(std::stol(*iterator));
+                        break;
+                    case ArgParser::TYPE::INT64:
+                        argument.value = static_cast<std::int64_t>(std::stoll(*iterator));
+                        break;
+                    case ArgParser::TYPE::UINT8:
+                        argument.value = static_cast<std::uint8_t>(std::stoul(*iterator));
+                        break;
+                    case ArgParser::TYPE::UINT16:
+                        argument.value = static_cast<std::uint16_t>(std::stoul(*iterator));
+                        break;
+                    case ArgParser::TYPE::UINT32:
+                        argument.value = static_cast<std::uint32_t>(std::stoul(*iterator));
+                        break;
+                    case ArgParser::TYPE::UINT64:
+                        argument.value = static_cast<std::uint64_t>(std::stoull(*iterator));
+                        break;
+                    case ArgParser::TYPE::FLOAT:
+                        argument.value = static_cast<float>(std::stof(*iterator));
+                        break;
+                    case ArgParser::TYPE::DOUBLE:
+                        argument.value = static_cast<double>(std::stod(*iterator));
+                        break;
+                    case ArgParser::TYPE::LONG_DOUBLE:
+                        argument.value = static_cast<long double>(std::stold(*iterator));
+                        break;
                 }
+            } catch(const std::invalid_argument& ia) {
+                // could not convert argument to specified type, incompatible type
+                return returns::unexpected{returns::ParseError{returns::ParseError::TYPE::INCOMPATIBLE_TYPE, argument.name}};
+            } catch(const std::out_of_range& oor) {
+                // the value of the argument does not match the type specified, range error
+                return returns::unexpected{returns::ParseError{returns::ParseError::TYPE::RANGE_ERROR, argument.name}};
             }
         }
-        return requiredArguments;
+        return argument;
     }
-
 }

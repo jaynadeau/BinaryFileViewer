@@ -1,17 +1,14 @@
 #include "ApplicationManager.h"
-#include "Returns/CStdError.h"
 #include "Returns/ApplicationError.h"
+#include "Returns/CStdError.h"
 #include "Returns/Exceptions/ArgParserException.h"
-#include "Utils/ArgParser.h"
+#include "Utils/ArgParser/ArgParser.h"
 #include "Utils/Threads/DeferredJoinableThread.h"
 
 #include <chrono>
 #include <thread>
 #include <iostream>
 #include <string>
-
-
-using namespace bfv;
 
 void workerMethod(int a, int b) {
     for (int i = 0; i < 10; ++i) {
@@ -26,25 +23,23 @@ int main(int argc, char* argv[])
 {
     std::cout << "Welcome to the binary file viewer app." << std::endl;
 //    static ApplicationManager& app = ApplicationManager::getInstance();
-    static utils::ArgParser& parser = utils::ArgParser::getInstance();
+    static utils::ArgParser parser;
     parser.addArgument("--input_filename", true, false, "Path to the binary file to be viewed.", utils::ArgParser::TYPE::STRING);
     parser.addArgument("--output_filename", false, false, "Path to the output text file to convert the binary file to.", utils::ArgParser::TYPE::STRING);
     parser.addArgument("--output_type", true, false, "The format to output/interpret the binary file as. Can be one of [UINT8_T, UINT16_T, UINT32_T, INT8_T, INT16_T, INT32_T, FLOAT32, HEX, CHAR, BINARY]", utils::ArgParser::TYPE::STRING);
-    try {
-        const utils::ArgParser::Arguments args = parser.Parse(argc, argv);
-        for(const auto& arg : args)
-        {
-            // get the std::any value...need helper method or methods...
-            std::string argValue = arg.value;
-            std::cout << arg.name << " " << static_cast<int>(arg.type) <<
-                " " << argValue << std::endl;
 
-            // << std::get<static_cast<int>(arg.type)>(arg.value) <<
+    utils::ArgParser::ExpectedArguments args = parser.Parse(argc, argv);
+    if (args.has_value()) {
+        for(const auto& arg : args.value())
+        {
+            std::cout << "Argument name: " << arg.name << " Argument value: " << arg.value.get<std::string>().value()
+            << " Argument type: " << static_cast<int>(arg.type) << std::endl;
+
             std::cout << std::endl;
         }
     }
-    catch (const returns::exceptions::ArgParserException& exception) {
-        std::cout << exception.what() << std::endl;
+    else {
+        std::cout << "Parsing error has occurred: " << args.error().getErrorAsString() << std::endl;
     }
 
     // std::cout << "Testing JoinableThread class..." << std::endl;

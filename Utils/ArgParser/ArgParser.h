@@ -1,11 +1,17 @@
 //
 // Created by jnadeau on 11/16/2022.
 //
+/**
+ * @file ArgParser.h
+ * @brief Header file for the ArgParser utility class.
+ *
+ * This file contains the definition of the ArgParser class, which provides
+ * functionality for defining, parsing, and validating command-line arguments
+ * in a type-safe manner.
+ */
+#ifndef UTILS_ARGPARSER_H
+#define UTILS_ARGPARSER_H
 
-#ifndef BINARYFILEVIEWER_ARGPARSER_H
-#define BINARYFILEVIEWER_ARGPARSER_H
-
-#include "../SingletonBase.h"
 
 #include <cstdint>
 #include <optional>
@@ -18,9 +24,21 @@
 
 namespace utils {
 
-    class ArgParser final : public SingletonBase<ArgParser>
+    /**
+     * @class ArgParser
+     * @brief A utility class for parsing command-line arguments.
+     *
+     * The ArgParser class allows users to define expected arguments, specify their types,
+     * indicate whether they are required or flags, and then parse the raw command-line
+     * input (argc/argv) to validate and retrieve these values.
+     */
+    class ArgParser final
     {
     public:
+        /**
+         * @enum TYPE
+         * @brief Enumeration of supported argument data types.
+         */
         enum class TYPE
         {
             STRING,
@@ -38,10 +56,23 @@ namespace utils {
         };
 
     private:
+        /**
+         * @struct ArgumentType
+         * @brief A type-safe wrapper for argument values using std::variant.
+         *
+         * This internal structure holds the parsed value of an argument. It supports
+         * assignment and retrieval using templates to ensure type safety.
+         */
         struct ArgumentType {
             using argValue_t = std::variant<std::string, std::int8_t, std::int16_t, std::int32_t, std::int64_t,
                     std::uint8_t, std::uint16_t, std::uint32_t, std::uint64_t, float, double, long double>;
 
+            /**
+             * @brief Assigns a value to the underlying variant.
+             * @tparam T The type of the value being assigned.
+             * @param val The value to assign.
+             * @return Reference to this ArgumentType.
+             */
             template<typename T>
             requires std::assignable_from<argValue_t&, T>
             ArgumentType& operator=(T&& val) {
@@ -49,6 +80,11 @@ namespace utils {
                 return *this;
             }
 
+            /**
+             * @brief Retrieves the value if it matches the requested type.
+             * @tparam T The expected type of the value.
+             * @return std::optional<T> containing the value if successful, or std::nullopt.
+             */
             template<typename T>
             std::optional<T> get() const {
                 if (auto* ptr = std::get_if<T>(&value)) {
@@ -57,17 +93,36 @@ namespace utils {
                 return std::nullopt;
             }
 
+            /**
+             * @brief Retrieves the value or returns a default if the type does not match.
+             * @tparam T The expected type of the value.
+             * @param default_val The default value to return if the retrieval fails.
+             * @return The stored value or the provided default.
+             */
             template<typename T>
             T get_or(T&& default_val) const {
                 return get<T>().value_or(std::forward<T>(default_val));
             }
 
+            /// The actual variant holding the data.
             argValue_t value;
         };
 
+        /**
+         * @struct Argument
+         * @brief Represents the definition and state of a single command-line argument.
+         */
         struct Argument {
             Argument() = delete;
-            Argument(std::string name, bool required, bool isFlag, std::string description, TYPE type);
+            /**
+             * @brief Constructs an Argument.
+             * @param name The name of the argument (e.g., "--help").
+             * @param isRequired True if the argument is mandatory.
+             * @param isFlag True if the argument is a flag (boolean) and takes no value.
+             * @param description Description of what the argument does.
+             * @param type The expected data type of the argument.
+             */
+            Argument(std::string_view name, bool isRequired, bool isFlag, std::string_view description, TYPE type);
             Argument(const Argument &other) = default;
             Argument(Argument &&other) noexcept = default;
             Argument& operator=(const Argument &other) = default;
@@ -79,35 +134,87 @@ namespace utils {
             bool isFlag{false};
             std::string description;
             ArgParser::TYPE type;
-            ArgumentType value;
+            ArgumentType value{};
         };
 
     public:
         using Arguments = std::vector<Argument>;
+        using ExpectedArguments = returns::expected<Arguments, returns::ParseError>;
+        using ExpectedArgument = returns::expected<Argument, returns::ParseError>;
 
+        /**
+         * @brief Default constructor.
+         */
+        ArgParser() = default;
+        // Copy and Move operations are deleted to prevent accidental duplication of the parser state.
         ArgParser(const ArgParser&) = delete;
         ArgParser(ArgParser&&) = delete;
         ArgParser& operator=(const ArgParser&) = delete;
         ArgParser& operator=(ArgParser&&) = delete;
-        ~ArgParser() override = default;
+        /**
+         * @brief Default destructor.
+         */
+        ~ArgParser() = default;
 
-        Arguments Parse(int argc, char* argv[]);
-        void addArgument(std::string name, bool required, bool isFlag, std::string description, TYPE type);
+        /**
+         * @brief Parses the command-line arguments.
+         *
+         * This function processes the arguments passed to the program, validates them against
+         * the defined expected arguments, and parses their values.
+         *
+         * @param argc The count of arguments.
+         * @param argv The array of argument strings.
+         * @return ExpectedArguments containing the parsed arguments on success, or a ParseError on failure.
+         */
+        ExpectedArguments Parse(int argc, char* argv[]);
+        /**
+         * @brief Adds a new expected argument to the parser.
+         *
+         * @param name The name of the argument (e.g., "--input").
+         * @param isRequired Whether the argument must be present for parsing to succeed.
+         * @param isFlag Whether the argument is a flag (no value expected) or takes a parameter.
+         * @param description A brief description of the argument for help text.
+         * @param type The expected data type of the argument value.
+         */
+        void addArgument(std::string_view name, bool isRequired, bool isFlag, std::string_view description, TYPE type);
+
     private:
-        ArgParser() = default;
-        friend class SingletonBase<ArgParser>;
+        /**
+         * @brief Validates the presence and types of all expected arguments.
+         * @param argumentsToValidate The list of raw string arguments to validate.
+         * @return ExpectedArguments on success, or ParseError on failure.
+         */
+        ExpectedArguments validateArguments(const std::vector<std::string>& argumentsToValidate);
+        /**
+         * @brief Validates and extracts the value for a specific argument.
+         * @param iterator Iterator to the current position in the raw argument list.
+         * @param argument The argument definition to validate against.
+         * @return ExpectedArgument containing the populated argument on success, or ParseError.
+         */
+        ExpectedArgument validateArgumentType(std::vector<std::string>::const_iterator& iterator, Argument& argument);
 
-        returns::expected<Arguments, returns::ParseError> validateArguments(const std::vector<std::string>& argumentsToValidate);
-        returns::expected<Arguments, returns::ParseError> validateArgumentTypes(Arguments& requiredArguments);
+        /**
+         * @brief Helper function to parse specific command line string formats.
+         * Handles cases like "--key=value" by splitting them.
+         * @param arg The single argument string to parse.
+         * @return A vector containing the split parts (or the original if no split occurred).
+         */
+        static std::vector<std::string> parseCommandLineArgs(const std::string& arg);
+        /**
+         * @brief Checks if the current iterator position looks like a flag.
+         * Used to prevent consuming the next flag as a value for the current argument.
+         * @param iterator Iterator to the potential value.
+         * @param argument The argument currently being processed.
+         * @return True if the value looks like a flag/option, False otherwise.
+         */
+        static bool looksLikeAFlag(std::vector<std::string>::const_iterator &iterator, Argument &argument);
 
         std::uint32_t mArgumentCount{0};
         std::vector<std::string> mOriginalArguments;
-        Arguments mExpectedArguments;
-        returns::expected<Arguments, returns::ParseError> mValidatedArguments;
-
-        [[nodiscard]] returns::expected<Arguments, returns::ParseError> getRequiredArguments(const std::vector<std::string> &argumentsToValidate) const;
+        Arguments mUserSpecifiedArguments;
+        ExpectedArguments mValidatedArguments;
     };
 
 }
 
-#endif //BINARYFILEVIEWER_ARGPARSER_H
+#endif //UTILS_ARGPARSER_H
