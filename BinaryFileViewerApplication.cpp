@@ -4,26 +4,55 @@
 
 #include "BinaryFileViewerApplication.h"
 
+#include <iostream>
+
 namespace bfv {
 
-    void BinaryFileViewerApplication::Start() {
-        // mMainThread = std::thread(&BinaryFileViewerApplication::ApplicationMain, this, std::ref(mStopFlag));
+    BinaryFileViewerApplication::BinaryFileViewerApplication(std::string_view inputFilename, std::string_view outputType, std::string_view outputFilename)
+    : mInputFilename{inputFilename}
+    , mOutputFilename{outputFilename}
+    , mOutputType{outputType}
+    {
+        mMainThread = utils::threads::makeDeferredMemberThread(this, &BinaryFileViewerApplication::applicationMain);
     }
 
-    void BinaryFileViewerApplication::Stop() {
+
+    void BinaryFileViewerApplication::start() {
+        std::cout << "starting app..." << std::endl;
+        mMainThread.start();
+    }
+
+    void BinaryFileViewerApplication::stop() {
 
     }
 
-    void BinaryFileViewerApplication::Restart() {
+    void BinaryFileViewerApplication::restart() {
 
     }
 
-    void BinaryFileViewerApplication::Pause() {
+    void BinaryFileViewerApplication::pause() {
 
     }
 
-    void BinaryFileViewerApplication::ApplicationMain(void *arg, std::atomic<bool>& stopFlag) {
+    void BinaryFileViewerApplication::applicationMain() {
+        sleep(2);
 
+        std::cout << "Opening file: " << mInputFilename << std::endl;
+        std::cout << "Opening file: " << mInputFilename << std::endl;
+        std::cout << "Opening file: " << mInputFilename << std::endl;
+        std::cout << "Opening file: " << mInputFilename << std::endl;
+        std::cout << "Opening file: " << mInputFilename << std::endl;
+        std::cout << "Opening file: " << mInputFilename << std::endl;
+        std::cout << "Opening file: " << mInputFilename << std::endl;
+        std::cout << "Opening file: " << mInputFilename << std::endl;
+        std::cout << "Opening file: " << mInputFilename << std::endl;
+        std::cout << "Opening file: " << mInputFilename << std::endl;
+        std::cout << "Opening file: " << mInputFilename << std::endl;
+        std::cout << "Opening file: " << mInputFilename << std::endl;
+        std::cout << "Opening file: " << mInputFilename << std::endl;
+        std::cout << "Opening file: " << mInputFilename << std::endl;
+        std::cout << "Opening file: " << mInputFilename << std::endl;
+        std::cout << "Opening file: " << mInputFilename << std::endl;
     }
 
 

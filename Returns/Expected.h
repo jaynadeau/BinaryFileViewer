@@ -2,8 +2,8 @@
 // Created by jnadeau on 12/6/2023.
 //
 
-#ifndef BINARYFILEVIEWER_EXPECTED_H
-#define BINARYFILEVIEWER_EXPECTED_H
+#ifndef RETURNS_EXPECTED_H
+#define RETURNS_EXPECTED_H
 
 ///
 // expected - An implementation of std::expected with extensions
@@ -2444,4 +2444,4 @@ detail::decay_t<Exp> or_else_impl(Exp &&exp, F &&f) {
 
 }
 
-#endif //BINARYFILEVIEWER_EXPECTED_H
+#endif //RETURNS_EXPECTED_H

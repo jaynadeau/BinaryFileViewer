@@ -2,8 +2,8 @@
 // Created by jnadeau on 11/18/2022.
 //
 
-#ifndef BFV_CONFIGURATION_H
-#define BFV_CONFIGURATION_H
+#ifndef CONFIGURATION_BFV_CONFIGURATION_H
+#define CONFIGURATION_BFV_CONFIGURATION_H
 
 #include "IConfiguration.h"
 
@@ -21,4 +21,4 @@ namespace bfv::configuration {
 
 }
 
-#endif // BFV_CONFIGURATION_H
+#endif // CONFIGURATION_BFV_CONFIGURATION_H

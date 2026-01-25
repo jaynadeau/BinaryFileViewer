@@ -2,8 +2,8 @@
 // Created by jnadeau on 10/4/2022.
 //
 
-#ifndef BINARYFILEVIEWER_STATUS_H
-#define BINARYFILEVIEWER_STATUS_H
+#ifndef RETURNS_STATUS_H
+#define RETURNS_STATUS_H
 
 
 #include "ErrorBase.h"
@@ -168,4 +168,4 @@ namespace returns {
 
 }
 
-#endif //BINARYFILEVIEWER_STATUS_H
+#endif //RETURNS_STATUS_H

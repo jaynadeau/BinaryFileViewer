@@ -2,8 +2,8 @@
 // Created by jnadeau on 10/5/2022.
 //
 
-#ifndef BINARYFILEVIEWER_IFILE_H
-#define BINARYFILEVIEWER_IFILE_H
+#ifndef FILES_IFILE_H
+#define FILES_IFILE_H
 
 namespace files {
 
@@ -13,4 +13,4 @@ class IFile {
 };
 
 
-#endif //BINARYFILEVIEWER_IFILE_H
+#endif //FILES_IFILE_H

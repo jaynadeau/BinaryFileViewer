@@ -24,6 +24,19 @@ namespace utils {
         mUserSpecifiedArguments.emplace_back(std::string(name), isRequired, isFlag, std::string(description), type);
     }
 
+    // void ArgParser::setDefaultValue(std::string_view name, std::string_view defaultValue) {
+    //
+    // }
+
+    ArgParser& ArgParser::addString(const std::string& name, bool required, const std::string& help,
+        const std::string& defaultValue) {
+        addArgument(name, required, false, help, TYPE::STRING);
+        // if (!required && !defaultValue.empty()) {
+        //     setDefaultValue(name, defaultValue);
+        // }
+        return *this;
+    }
+
     std::vector<std::string> ArgParser::parseCommandLineArgs(const std::string& arg) {
         std::vector<std::string> parsedArgs;
         if (const auto it = arg.find_first_of("="); it != std::string::npos) {
@@ -38,7 +51,7 @@ namespace utils {
         return parsedArgs;
     }
 
-    ArgParser::ExpectedArguments ArgParser::Parse(const int argc, char **argv) {
+    ArgParser::ExpectedNamedArguments ArgParser::parseInternal(const int argc, char **argv) {
         mArgumentCount = argc;
         mOriginalArguments.reserve(mArgumentCount);
         for(int argCount = 1; argCount < mArgumentCount; ++argCount)
@@ -54,12 +67,22 @@ namespace utils {
         return mValidatedArguments;
     }
 
-    ArgParser::ExpectedArguments ArgParser::validateArguments(const std::vector<std::string>& argumentsToValidate) {
-        Arguments validatedArguments;
+    ArgParser::ExpectedParseResult ArgParser::parse(int argc, char** argv) {
+        auto result = parseInternal(argc, argv);
+        if (!result.has_value())
+            return returns::unexpected(result.error());
+        return ParseResult(std::move(result.value()));
+    }
+
+    ArgParser::ExpectedNamedArguments ArgParser::validateArguments(const std::vector<std::string>& argumentsToValidate) {
+        NamedArguments validatedArguments;
         for(auto& specifiedArgument : mUserSpecifiedArguments) {
             if(auto foundArg = std::find(argumentsToValidate.begin(), argumentsToValidate.end(), specifiedArgument.name); foundArg != argumentsToValidate.end()) {
                 if (ExpectedArgument argument = validateArgumentType(foundArg, specifiedArgument); argument.has_value()) {
-                    validatedArguments.emplace_back(argument.value());
+                    // validatedArguments.emplace_back(argument.value());
+                    if (bool isAdded = validatedArguments.emplace(specifiedArgument.name, argument.value()).second; !isAdded) {
+                        return returns::unexpected{returns::ParseError{returns::ParseError::TYPE::ARGUMENT_EXISTS, specifiedArgument.name}};
+                    }
                 }
                 else {
                     return returns::unexpected(argument.error());
@@ -86,7 +109,6 @@ namespace utils {
                 }
             }
         }
-
         return false;
     }
 
@@ -108,6 +130,9 @@ namespace utils {
                     case ArgParser::TYPE::STRING:
                         argument.value = std::string{*iterator};
                         break;
+                    case ArgParser::TYPE::INT:
+                        argument.value = std::stoi(*iterator);
+                        break;
                     case ArgParser::TYPE::INT8:
                         argument.value = static_cast<std::int8_t>(std::stoi(*iterator));
                         break;
@@ -120,6 +145,12 @@ namespace utils {
                     case ArgParser::TYPE::INT64:
                         argument.value = static_cast<std::int64_t>(std::stoll(*iterator));
                         break;
+                    case ArgParser::TYPE::LONG:
+                        argument.value = std::stol(*iterator);
+                        break;
+                    case ArgParser::TYPE::UINT:
+                        argument.value = static_cast<unsigned int>(std::stoul(*iterator));
+                        break;
                     case ArgParser::TYPE::UINT8:
                         argument.value = static_cast<std::uint8_t>(std::stoul(*iterator));
                         break;
@@ -131,6 +162,9 @@ namespace utils {
                         break;
                     case ArgParser::TYPE::UINT64:
                         argument.value = static_cast<std::uint64_t>(std::stoull(*iterator));
+                        break;
+                    case ArgParser::TYPE::ULONG:
+                        argument.value = std::stoul(*iterator);
                         break;
                     case ArgParser::TYPE::FLOAT:
                         argument.value = static_cast<float>(std::stof(*iterator));

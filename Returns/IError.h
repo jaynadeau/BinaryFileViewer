@@ -2,8 +2,8 @@
 // Created by jnadeau on 10/4/2022.
 //
 
-#ifndef BINARYFILEVIEWER_IERROR_H
-#define BINARYFILEVIEWER_IERROR_H
+#ifndef RETURNS_IERROR_H
+#define RETURNS_IERROR_H
 
 #include <iostream>
 #include <string>
@@ -22,4 +22,4 @@ namespace returns {
 
 }
 
-#endif //BINARYFILEVIEWER_IERROR_H
+#endif //RETURNS_IERROR_H

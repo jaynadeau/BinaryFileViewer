@@ -9,8 +9,8 @@
  * functionality for defining, parsing, and validating command-line arguments
  * in a type-safe manner.
  */
-#ifndef UTILS_ARGPARSER_H
-#define UTILS_ARGPARSER_H
+#ifndef ARGPARSER_ARGPARSER_H
+#define ARGPARSER_ARGPARSER_H
 
 
 #include <cstdint>
@@ -42,14 +42,18 @@ namespace utils {
         enum class TYPE
         {
             STRING,
+            INT,
             INT8,
             INT16,
             INT32,
             INT64,
+            LONG,
+            UINT,
             UINT8,
             UINT16,
             UINT32,
             UINT64,
+            ULONG,
             FLOAT,
             DOUBLE,
             LONG_DOUBLE,
@@ -68,6 +72,38 @@ namespace utils {
                     std::uint8_t, std::uint16_t, std::uint32_t, std::uint64_t, float, double, long double>;
 
             /**
+             * @brief Retrieves the value if it matches the requested type.
+             * @tparam T The expected type of the value.
+             * @return std::optional<T> containing the value if successful, or std::nullopt.
+             */
+            template<typename T>
+            std::optional<T> get() const {
+                // Map common types to the actual variant types
+                if constexpr (std::is_same_v<T, int>) {
+                    if (auto* ptr = std::get_if<std::int32_t>(&value)) {
+                        return static_cast<T>(*ptr);
+                    }
+                } else if constexpr (std::is_same_v<T, unsigned int>) {
+                    if (auto* ptr = std::get_if<std::uint32_t>(&value)) {
+                        return static_cast<T>(*ptr);
+                    }
+                } else if constexpr (std::is_same_v<T, long>) {
+                    if (auto* ptr = std::get_if<std::int64_t>(&value)) {
+                        return static_cast<T>(*ptr);
+                    }
+                } else if constexpr (std::is_same_v<T, unsigned long>) {
+                    if (auto* ptr = std::get_if<std::uint64_t>(&value)) {
+                        return static_cast<T>(*ptr);
+                    }
+                } else {
+                    // For exact type matches
+                    if (auto* ptr = std::get_if<T>(&value)) {
+                        return *ptr;
+                    }
+                }
+                return std::nullopt;
+            }
+            /**
              * @brief Assigns a value to the underlying variant.
              * @tparam T The type of the value being assigned.
              * @param val The value to assign.
@@ -85,13 +121,13 @@ namespace utils {
              * @tparam T The expected type of the value.
              * @return std::optional<T> containing the value if successful, or std::nullopt.
              */
-            template<typename T>
-            std::optional<T> get() const {
-                if (auto* ptr = std::get_if<T>(&value)) {
-                    return *ptr;
-                }
-                return std::nullopt;
-            }
+            // template<typename T>
+            // std::optional<T> get() const {
+            //     if (auto* ptr = std::get_if<T>(&value)) {
+            //         return *ptr;
+            //     }
+            //     return std::nullopt;
+            // }
 
             /**
              * @brief Retrieves the value or returns a default if the type does not match.
@@ -113,7 +149,7 @@ namespace utils {
          * @brief Represents the definition and state of a single command-line argument.
          */
         struct Argument {
-            Argument() = delete;
+            Argument() = default;
             /**
              * @brief Constructs an Argument.
              * @param name The name of the argument (e.g., "--help").
@@ -139,9 +175,63 @@ namespace utils {
 
     public:
         using Arguments = std::vector<Argument>;
+        using NamedArguments = std::unordered_map<std::string, Argument>;
         using ExpectedArguments = returns::expected<Arguments, returns::ParseError>;
+        using ExpectedNamedArguments = returns::expected<NamedArguments, returns::ParseError>;
         using ExpectedArgument = returns::expected<Argument, returns::ParseError>;
 
+        // New: Result type with clean accessors
+        class ParseResult {
+        public:
+            explicit ParseResult(NamedArguments args) : args(std::move(args)) {}
+
+            // Type-safe accessors
+            std::string getString(const std::string& name, const std::string& defaultValue = "") const {
+                if (auto val = getValue<std::string>(name))
+                    return *val;
+                return defaultValue;
+            }
+
+            // bool getBool(const std::string& name, bool defaultValue = false) const {
+            //     if (auto val = getValue<bool>(name))
+            //         return *val;
+            //     return defaultValue;
+            // }
+
+            int getInt(const std::string& name, int defaultValue = 0) const {
+                if (auto val = getValue<int>(name))
+                    return *val;
+                return defaultValue;
+            }
+
+            // For optional arguments
+            std::optional<std::string> getStringOptional(const std::string& name) const {
+                return getValue<std::string>(name);
+            }
+
+            // Check if argument was provided
+            bool hasArgument(const std::string& name) const {
+                return args.find(name) != args.end();
+            }
+        private:
+            NamedArguments args;
+
+            // Helper to get a value with type conversion
+            template<typename T>
+            std::optional<T> getValue(const std::string& name) const {
+                const auto it = args.find(name);
+                if (it == args.end()) {
+                    return std::nullopt;
+                }
+
+                // Add your type conversion logic here
+                // This is where you'd handle converting from your variant/any type
+                // to the requested type T
+                return it->second.value.get<T>();
+            }
+
+        };
+        using ExpectedParseResult = returns::expected<ParseResult, returns::ParseError>;
         /**
          * @brief Default constructor.
          */
@@ -159,14 +249,13 @@ namespace utils {
         /**
          * @brief Parses the command-line arguments.
          *
-         * This function processes the arguments passed to the program, validates them against
-         * the defined expected arguments, and parses their values.
+         * This function processes the arguments passed to the program and parses their values.
          *
          * @param argc The count of arguments.
          * @param argv The array of argument strings.
-         * @return ExpectedArguments containing the parsed arguments on success, or a ParseError on failure.
+         * @return ExpectedParseResult containing the parsed arguments on success, or a ParseError on failure.
          */
-        ExpectedArguments Parse(int argc, char* argv[]);
+        ExpectedParseResult parse(int argc, char** argv);
         /**
          * @brief Adds a new expected argument to the parser.
          *
@@ -176,15 +265,56 @@ namespace utils {
          * @param description A brief description of the argument for help text.
          * @param type The expected data type of the argument value.
          */
-        void addArgument(std::string_view name, bool isRequired, bool isFlag, std::string_view description, TYPE type);
+        void addArgument(std::string_view name, bool isRequired, bool isFlag, std::string_view description,
+            TYPE type);
+
+        ArgParser& addString(const std::string& name, bool required = true, const std::string& help = "",
+            const std::string& defaultValue = "");
+
+        // Parse and immediately get values
+        // template<typename... Args>
+        // auto parseAndApply(int argc, char** argv, Args&&... argNames) {
+        //     auto result = parse(argc, argv);
+        //     if (!result) {
+        //         return returns::unexpected(result.error());
+        //     }
+        //
+        //     return std::make_tuple(result->getString(std::forward<Args>(argNames))...);
+        //     // return result->getString(std::forward<Args>(args)...);
+        // }
+        template<typename... Args>
+        auto parseAndApply(int argc, char** argv, Args&&... argNames) {
+            auto result = parse(argc, argv);
+
+            using TupleType = decltype(std::make_tuple(result->getString(argNames)...));
+            using ReturnType = returns::expected<TupleType, returns::ParseError>;
+
+            if (!result) {
+                return ReturnType(returns::unexpected(result.error()));
+            }
+
+            return ReturnType(std::make_tuple(result->getString(std::forward<Args>(argNames))...));
+        }
+
 
     private:
         /**
+         * @brief Parses the command-line arguments.
+         *
+         * This function processes the arguments passed to the program, validates them against
+         * the defined expected arguments, and parses their values.
+         *
+         * @param argc The count of arguments.
+         * @param argv The array of argument strings.
+         * @return ExpectedNamedArguments containing a map of the parsed arguments on success, or a ParseError on failure.
+         */
+        ExpectedNamedArguments parseInternal(int argc, char* argv[]);
+        /**
          * @brief Validates the presence and types of all expected arguments.
          * @param argumentsToValidate The list of raw string arguments to validate.
-         * @return ExpectedArguments on success, or ParseError on failure.
+         * @return ExpectedNamedArguments on success, or ParseError on failure.
          */
-        ExpectedArguments validateArguments(const std::vector<std::string>& argumentsToValidate);
+        ExpectedNamedArguments validateArguments(const std::vector<std::string>& argumentsToValidate);
         /**
          * @brief Validates and extracts the value for a specific argument.
          * @param iterator Iterator to the current position in the raw argument list.
@@ -212,9 +342,9 @@ namespace utils {
         std::uint32_t mArgumentCount{0};
         std::vector<std::string> mOriginalArguments;
         Arguments mUserSpecifiedArguments;
-        ExpectedArguments mValidatedArguments;
+        ExpectedNamedArguments mValidatedArguments;
     };
 
 }
 
-#endif //UTILS_ARGPARSER_H
+#endif //ARGPARSER_ARGPARSER_H

@@ -2,15 +2,15 @@
 // Created by jnadeau on 11/17/2025.
 //
 
-#ifndef BINARYFILEVIEWER_DEFERREDJOINABLETHREAD_H
-#define BINARYFILEVIEWER_DEFERREDJOINABLETHREAD_H
+#ifndef THREADS_DEFERRED_JOINABLETHREAD_H
+#define THREADS_DEFERRED_JOINABLETHREAD_H
 
 #include "JoinableThread.h"
 
 #include <functional>
-#include <utility>
 #include <stdexcept>
 #include <tuple>
+#include <utility>
 
 namespace utils::threads {
 
@@ -245,4 +245,4 @@ namespace utils::threads {
 
 }
 
-#endif //BINARYFILEVIEWER_DEFERREDJOINABLETHREAD_H
+#endif //THREADS_DEFERRED_JOINABLETHREAD_H

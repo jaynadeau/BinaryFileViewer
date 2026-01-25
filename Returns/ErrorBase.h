@@ -2,8 +2,8 @@
 // Created by jnadeau on 10/4/2022.
 //
 
-#ifndef BINARYFILEVIEWER_ERRORBASE_H
-#define BINARYFILEVIEWER_ERRORBASE_H
+#ifndef RETURNS_ERROR_BASE_H
+#define RETURNS_ERROR_BASE_H
 
 #include "IError.h"
 
@@ -30,4 +30,4 @@ namespace returns {
 
 }
 
-#endif //BINARYFILEVIEWER_ERRORBASE_H
+#endif //RETURNS_ERROR_BASE_H

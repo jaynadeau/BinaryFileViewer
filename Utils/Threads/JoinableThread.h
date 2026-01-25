@@ -2,8 +2,8 @@
 // Created by jnadeau on 11/12/2025.
 //
 
-#ifndef BINARYFILEVIEWER_JOINABLETHREAD_H
-#define BINARYFILEVIEWER_JOINABLETHREAD_H
+#ifndef THREADS_JOINABLETHREAD_H
+#define THREADS_JOINABLETHREAD_H
 
 #include <functional>
 #include <thread>
@@ -142,4 +142,4 @@ namespace utils::threads {
 
 }
 
-#endif //BINARYFILEVIEWER_JOINABLETHREAD_H
+#endif //THREADS_JOINABLETHREAD_H

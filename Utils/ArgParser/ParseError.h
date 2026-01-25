@@ -2,8 +2,8 @@
 // Created by jnadeau on 11/30/2023.
 //
 
-#ifndef BINARYFILEVIEWER_PARSEERROR_H
-#define BINARYFILEVIEWER_PARSEERROR_H
+#ifndef ARGPARSER_PARSE_ERROR_H
+#define ARGPARSER_PARSE_ERROR_H
 
 #include "../../Returns/ErrorBase.h"
 
@@ -17,7 +17,7 @@ namespace returns {
     {
 
     public:
-        enum class TYPE : int
+        enum class TYPE
         {
             INCOMPATIBLE_TYPE,
             RANGE_ERROR,
@@ -26,6 +26,7 @@ namespace returns {
             UNEXPECTED_TYPE,
             UNKNOWN_ARGUMENT,
             UNSUPPORTED_ARGUMENT,
+            ARGUMENT_EXISTS,
         };
 
         ParseError() = default;
@@ -47,6 +48,7 @@ namespace returns {
                                                                {TYPE::UNEXPECTED_TYPE,      "The Argument does not have the expected argument type"},
                                                                {TYPE::UNKNOWN_ARGUMENT,     "The Argument does not match the expected arguments"},
                                                                {TYPE::UNSUPPORTED_ARGUMENT, "Positional arguments are not supported"},
+                                                               {TYPE::ARGUMENT_EXISTS,      "The argument already exists or has the same name as an existing argument"},
         };
     };
 
@@ -57,7 +59,8 @@ namespace returns {
     static const inline ParseError UNEXPECTED_TYPE{ParseError::TYPE::UNEXPECTED_TYPE};
     static const inline ParseError UNKNOWN_ARGUMENT{ParseError::TYPE::UNKNOWN_ARGUMENT};
     static const inline ParseError UNSUPPORTED_ARGUMENT{ParseError::TYPE::UNSUPPORTED_ARGUMENT};
+    static const inline ParseError ARGUMENT_EXISTS{ParseError::TYPE::ARGUMENT_EXISTS};
 
 }
 
-#endif //BINARYFILEVIEWER_PARSEERROR_H
+#endif //ARGPARSER_PARSE_ERROR_H

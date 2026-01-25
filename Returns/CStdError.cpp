@@ -16,8 +16,7 @@ namespace returns {
     : ErrorBase(errno)
     {
         char tmpBuf[TMP_BUF_SIZE];
-        int result = strerror_r(mErrorNumber, tmpBuf, TMP_BUF_SIZE);
-        switch (result) {
+        switch (int result = strerror_r(mErrorNumber, tmpBuf, TMP_BUF_SIZE)) {
             case 0:
                 mErrorMessage.assign(tmpBuf);
                 break;

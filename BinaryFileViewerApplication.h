@@ -5,21 +5,26 @@
 #ifndef BINARYFILEVIEWER_BINARYFILEVIEWERAPPLICATION_H
 #define BINARYFILEVIEWER_BINARYFILEVIEWERAPPLICATION_H
 
-#include "Utils/IApplication.h"
+#include "Application/ApplicationBase.h"
 #include "Utils/Threads/DeferredJoinableThread.h"
 
 namespace bfv {
 
-    class BinaryFileViewerApplication : public utils::IApplication {
+    class BinaryFileViewerApplication : public application::ApplicationBase {
     public:
-        void Start() override;
-        void Stop() override;
-        void Restart() override;
-        void Pause() override;
+        BinaryFileViewerApplication(std::string_view inputFilename, std::string_view outputType, std::string_view outputFilename = "default.out");
+        ~BinaryFileViewerApplication() = default;
+
+        void start()   override;
+        void stop()    override;
+        void restart() override;
+        void pause()   override;
     private:
-        // std::atomic<bool>& mStopFlag;
-        utils::threads::DeferredJoinableThread mMainThread;
-        void ApplicationMain(void* arg, std::atomic<bool>& stopFlag) override;
+        void applicationMain();
+
+        std::string mInputFilename;
+        std::string mOutputFilename;
+        std::string mOutputType;
     };
 }
 

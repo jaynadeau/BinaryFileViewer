@@ -2,8 +2,8 @@
 // Created by jnadeau on 10/4/2022.
 //
 
-#ifndef BINARYFILEVIEWER_CSTDERROR_H
-#define BINARYFILEVIEWER_CSTDERROR_H
+#ifndef RETURNS_CSTDERROR_H
+#define RETURNS_CSTDERROR_H
 
 #include "ErrorBase.h"
 
