@@ -117,19 +117,6 @@ namespace utils {
             }
 
             /**
-             * @brief Retrieves the value if it matches the requested type.
-             * @tparam T The expected type of the value.
-             * @return std::optional<T> containing the value if successful, or std::nullopt.
-             */
-            // template<typename T>
-            // std::optional<T> get() const {
-            //     if (auto* ptr = std::get_if<T>(&value)) {
-            //         return *ptr;
-            //     }
-            //     return std::nullopt;
-            // }
-
-            /**
              * @brief Retrieves the value or returns a default if the type does not match.
              * @tparam T The expected type of the value.
              * @param default_val The default value to return if the retrieval fails.
@@ -192,6 +179,8 @@ namespace utils {
                 return defaultValue;
             }
 
+            // TODO: add all the types
+
             // bool getBool(const std::string& name, bool defaultValue = false) const {
             //     if (auto val = getValue<bool>(name))
             //         return *val;
@@ -202,11 +191,6 @@ namespace utils {
                 if (auto val = getValue<int>(name))
                     return *val;
                 return defaultValue;
-            }
-
-            // For optional arguments
-            std::optional<std::string> getStringOptional(const std::string& name) const {
-                return getValue<std::string>(name);
             }
 
             // Check if argument was provided
@@ -224,9 +208,6 @@ namespace utils {
                     return std::nullopt;
                 }
 
-                // Add your type conversion logic here
-                // This is where you'd handle converting from your variant/any type
-                // to the requested type T
                 return it->second.value.get<T>();
             }
 
@@ -265,23 +246,14 @@ namespace utils {
          * @param description A brief description of the argument for help text.
          * @param type The expected data type of the argument value.
          */
-        void addArgument(std::string_view name, bool isRequired, bool isFlag, std::string_view description,
+        ArgParser& addArgument(std::string_view name, bool isRequired, bool isFlag, std::string_view description,
             TYPE type);
 
         ArgParser& addString(const std::string& name, bool required = true, const std::string& help = "",
             const std::string& defaultValue = "");
 
-        // Parse and immediately get values
-        // template<typename... Args>
-        // auto parseAndApply(int argc, char** argv, Args&&... argNames) {
-        //     auto result = parse(argc, argv);
-        //     if (!result) {
-        //         return returns::unexpected(result.error());
-        //     }
-        //
-        //     return std::make_tuple(result->getString(std::forward<Args>(argNames))...);
-        //     // return result->getString(std::forward<Args>(args)...);
-        // }
+        // TODO: add addInt, and others....
+
         template<typename... Args>
         auto parseAndApply(int argc, char** argv, Args&&... argNames) {
             auto result = parse(argc, argv);
@@ -295,7 +267,6 @@ namespace utils {
 
             return ReturnType(std::make_tuple(result->getString(std::forward<Args>(argNames))...));
         }
-
 
     private:
         /**

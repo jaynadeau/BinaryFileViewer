@@ -6,7 +6,6 @@
 
 #include <algorithm>
 #include <cctype>
-#include <iostream>
 
 #include "../../Returns/Exceptions/ArgParserException.h"
 
@@ -20,8 +19,9 @@ namespace utils {
     , type{type}
     {}
 
-    void ArgParser::addArgument(std::string_view name, bool isRequired, bool isFlag, std::string_view description, ArgParser::TYPE type) {
+    ArgParser& ArgParser::addArgument(std::string_view name, bool isRequired, bool isFlag, std::string_view description, ArgParser::TYPE type) {
         mUserSpecifiedArguments.emplace_back(std::string(name), isRequired, isFlag, std::string(description), type);
+        return *this;
     }
 
     // void ArgParser::setDefaultValue(std::string_view name, std::string_view defaultValue) {
