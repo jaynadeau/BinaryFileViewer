@@ -6,6 +6,9 @@
 
 #include <iostream>
 
+#include "Files/BinaryFile.h"
+#include "Files/BinaryFileConverter.h"
+
 namespace bfv {
 
     BinaryFileViewerApplication::BinaryFileViewerApplication(std::string_view inputFilename, std::string_view outputType, std::string_view outputFilename)
@@ -19,11 +22,13 @@ namespace bfv {
 
     void BinaryFileViewerApplication::start() {
         std::cout << "starting app..." << std::endl;
+        ApplicationBase::start();
         mMainThread.start();
     }
 
     void BinaryFileViewerApplication::stop() {
-
+        std::cout << "stopping app..." << std::endl;
+        ApplicationBase::stop();
     }
 
     void BinaryFileViewerApplication::restart() {
@@ -34,25 +39,30 @@ namespace bfv {
 
     }
 
-    void BinaryFileViewerApplication::applicationMain() {
-        sleep(2);
+    void BinaryFileViewerApplication::resume() {
 
-        std::cout << "Opening file: " << mInputFilename << std::endl;
-        std::cout << "Opening file: " << mInputFilename << std::endl;
-        std::cout << "Opening file: " << mInputFilename << std::endl;
-        std::cout << "Opening file: " << mInputFilename << std::endl;
-        std::cout << "Opening file: " << mInputFilename << std::endl;
-        std::cout << "Opening file: " << mInputFilename << std::endl;
-        std::cout << "Opening file: " << mInputFilename << std::endl;
-        std::cout << "Opening file: " << mInputFilename << std::endl;
-        std::cout << "Opening file: " << mInputFilename << std::endl;
-        std::cout << "Opening file: " << mInputFilename << std::endl;
-        std::cout << "Opening file: " << mInputFilename << std::endl;
-        std::cout << "Opening file: " << mInputFilename << std::endl;
-        std::cout << "Opening file: " << mInputFilename << std::endl;
-        std::cout << "Opening file: " << mInputFilename << std::endl;
-        std::cout << "Opening file: " << mInputFilename << std::endl;
-        std::cout << "Opening file: " << mInputFilename << std::endl;
+    }
+
+    void BinaryFileViewerApplication::applicationMain() {
+        mStateFlag.store(application::APPLICATION_STATE::RUNNING);
+
+        std::cout << "Starting BinaryFileViewerApplication worker thread..." << std::endl;
+        while (mStateFlag.load() != application::APPLICATION_STATE::STOPPED) {
+            sleep(2);
+
+            std::cout << "Opening file: " << mInputFilename << std::endl;
+            std::cout << "Output file: " << mOutputFilename << std::endl;
+            std::cout << "Output type: " << mOutputType << std::endl;
+
+            // open input file in binary mode
+            files::BinaryFile file{mInputFilename};
+            // convert the type to the specified type
+            files::BinaryFileConverter converter{mOutputType};
+            converter.convert(file.getData());
+
+            // output the file using the specified output filename
+        }
+        std::cout << "Thread worker stopped..." << std::endl;
     }
 
 

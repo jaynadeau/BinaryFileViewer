@@ -21,8 +21,9 @@ namespace application {
         void stop() override;
         void restart() override;
         void pause() override;
+        void resume() override;
     protected:
-        std::atomic<application::APPLICATION_STATE> mStateFlag{application::APPLICATION_STATE::UNKNOWN};
+        std::atomic<APPLICATION_STATE> mStateFlag{APPLICATION_STATE::UNKNOWN};
         utils::threads::DeferredJoinableThread mMainThread;
     };
 

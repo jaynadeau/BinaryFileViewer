@@ -7,10 +7,13 @@
 
 namespace files {
 
+    class IFile {
+        explicit IFile(std::string_view filename);
+        virtual ~IFile();
+
+
+    };
+
 }
-class IFile {
-
-};
-
 
 #endif //FILES_IFILE_H

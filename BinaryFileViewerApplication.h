@@ -13,12 +13,13 @@ namespace bfv {
     class BinaryFileViewerApplication : public application::ApplicationBase {
     public:
         BinaryFileViewerApplication(std::string_view inputFilename, std::string_view outputType, std::string_view outputFilename = "default.out");
-        ~BinaryFileViewerApplication() = default;
+        ~BinaryFileViewerApplication() override = default;
 
         void start()   override;
         void stop()    override;
         void restart() override;
         void pause()   override;
+        void resume()  override;
     private:
         void applicationMain();
 

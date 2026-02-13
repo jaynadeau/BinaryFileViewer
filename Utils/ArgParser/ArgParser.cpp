@@ -24,17 +24,12 @@ namespace utils {
         return *this;
     }
 
-    // void ArgParser::setDefaultValue(std::string_view name, std::string_view defaultValue) {
-    //
-    // }
-
     ArgParser& ArgParser::addString(const std::string& name, bool required, const std::string& help,
         const std::string& defaultValue) {
-        addArgument(name, required, false, help, TYPE::STRING);
+        return addArgument(name, required, false, help, TYPE::STRING);
         // if (!required && !defaultValue.empty()) {
         //     setDefaultValue(name, defaultValue);
         // }
-        return *this;
     }
 
     std::vector<std::string> ArgParser::parseCommandLineArgs(const std::string& arg) {
@@ -95,7 +90,7 @@ namespace utils {
         return validatedArguments;
     }
 
-    bool ArgParser::looksLikeAFlag(std::vector<std::string>::const_iterator &iterator, ArgParser::Argument &argument) {
+    bool ArgParser::looksLikeAFlag(const std::vector<std::string>::const_iterator &iterator, const ArgParser::Argument &argument) {
         if (iterator->rfind("--", 0) == 0) { // Starts with "--"
             return true;
         }
@@ -130,8 +125,8 @@ namespace utils {
                     case ArgParser::TYPE::STRING:
                         argument.value = std::string{*iterator};
                         break;
-                    case ArgParser::TYPE::INT:
-                        argument.value = std::stoi(*iterator);
+                    case ArgParser::TYPE::BOOL:
+                        argument.value = (std::string{*iterator} == "true");
                         break;
                     case ArgParser::TYPE::INT8:
                         argument.value = static_cast<std::int8_t>(std::stoi(*iterator));
@@ -145,12 +140,6 @@ namespace utils {
                     case ArgParser::TYPE::INT64:
                         argument.value = static_cast<std::int64_t>(std::stoll(*iterator));
                         break;
-                    case ArgParser::TYPE::LONG:
-                        argument.value = std::stol(*iterator);
-                        break;
-                    case ArgParser::TYPE::UINT:
-                        argument.value = static_cast<unsigned int>(std::stoul(*iterator));
-                        break;
                     case ArgParser::TYPE::UINT8:
                         argument.value = static_cast<std::uint8_t>(std::stoul(*iterator));
                         break;
@@ -163,17 +152,14 @@ namespace utils {
                     case ArgParser::TYPE::UINT64:
                         argument.value = static_cast<std::uint64_t>(std::stoull(*iterator));
                         break;
-                    case ArgParser::TYPE::ULONG:
-                        argument.value = std::stoul(*iterator);
-                        break;
                     case ArgParser::TYPE::FLOAT:
-                        argument.value = static_cast<float>(std::stof(*iterator));
+                        argument.value = std::stof(*iterator);
                         break;
                     case ArgParser::TYPE::DOUBLE:
-                        argument.value = static_cast<double>(std::stod(*iterator));
+                        argument.value = std::stod(*iterator);
                         break;
                     case ArgParser::TYPE::LONG_DOUBLE:
-                        argument.value = static_cast<long double>(std::stold(*iterator));
+                        argument.value = std::stold(*iterator);
                         break;
                 }
             } catch(const std::invalid_argument& ia) {

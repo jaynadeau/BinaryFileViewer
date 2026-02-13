@@ -20,10 +20,11 @@ namespace application {
         IApplication() = default;
         virtual ~IApplication() = default;
 
-        virtual void start() = 0;
-        virtual void stop() = 0;
+        virtual void start()   = 0;
+        virtual void stop()    = 0;
         virtual void restart() = 0;
-        virtual void pause() = 0;
+        virtual void pause()   = 0;
+        virtual void resume()  = 0;
         // optional
         // template<typename... Args>
     protected:

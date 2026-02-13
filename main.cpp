@@ -1,10 +1,9 @@
 #include "Application/ApplicationManager.h"
 #include "BinaryFileViewerApplication.h"
-#include "Returns/Exceptions/ArgParserException.h"
 #include "Utils/ArgParser/ArgParser.h"
 #include "Utils/Threads/DeferredJoinableThread.h"
 
-
+#include <cstdlib>
 #include <iostream>
 #include <string>
 
@@ -14,21 +13,24 @@ int main(int argc, char* argv[])
 {
     std::cout << "Welcome to the binary file viewer app." << std::endl;
 //    static ApplicationManager& app = ApplicationManager::getInstance();
-    auto result = utils::ArgParser().addString("--input_filename", true, "Input file path")
+    auto result = utils::ArgParser()
+        .addString("--input_filename", true, "Input file path")
         .addString("--output_type", true, "Output format")
         .addString("--output_filename", false, "Output file path", "output.txt")
-        .parseAndApply(argc, argv,
-              "--input_filename",
-              "--output_type",
-              "--output_filename");
+        .parse(argc, argv);
 
-    if (!result) {
+    if (!result.has_value()) {
         std::cerr << result.error().getErrorAsString() << std::endl;
-        return 1;
+        return EXIT_FAILURE;
     }
-    auto [inputFilename, outputType, outputFilename] = *result;
+    const auto inputFilename = result.value().getString("--input_filename");
+    const auto outputType = result.value().getString("--output_type");
+    const auto outputFilename = result.value().getString("--output_filename");
     BinaryFileViewerApplication app{inputFilename, outputType, outputFilename};
     app.start();
+    sleep(10);
+    app.stop();
+    std::cout << "Application stopped." << std::endl;
     // parser.addArgument("--input_filename", true, false, "Path to the binary file to be viewed.", utils::ArgParser::TYPE::STRING);
     // parser.addArgument("--output_filename", false, false, "Path to the output text file to convert the binary file to.", utils::ArgParser::TYPE::STRING);
     // parser.addArgument("--output_type", true, false, "The format to output/interpret the binary file as. Can be one of [UINT8_T, UINT16_T, UINT32_T, INT8_T, INT16_T, INT32_T, FLOAT32, HEX, CHAR, BINARY]", utils::ArgParser::TYPE::STRING);
@@ -93,19 +95,19 @@ int main(int argc, char* argv[])
     // auto memberThread = utils::threads::makeDeferredMemberThread(&obj, &MyClass::method, 42);
     // memberThread.start();
 
-    std::cout << "Test 6. Member function helper but thread also member" << std::endl;
-    class MyClass {
-    public:
-        MyClass() {
-            mMainThread = utils::threads::makeDeferredMemberThread(this, &MyClass::method, 42);
-        }
-        void method(int x) { std::cout << x << '\n'; }
-        void start() { mMainThread.start(); }
-    private:
-        utils::threads::DeferredJoinableThread mMainThread;
-    };
-    MyClass obj;
-    obj.start();
+    // std::cout << "Test 6. Member function helper but thread also member" << std::endl;
+    // class MyClass {
+    // public:
+    //     MyClass() {
+    //         mMainThread = utils::threads::makeDeferredMemberThread(this, &MyClass::method, 42);
+    //     }
+    //     void method(int x) { std::cout << x << '\n'; }
+    //     void start() { mMainThread.start(); }
+    // private:
+    //     utils::threads::DeferredJoinableThread mMainThread;
+    // };
+    // MyClass obj;
+    // obj.start();
 
     //
     // // 7. Exception cases
@@ -120,5 +122,5 @@ int main(int argc, char* argv[])
 
 
 
-    return 0;
+    return EXIT_SUCCESS;
 }

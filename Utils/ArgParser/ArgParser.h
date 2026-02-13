@@ -16,6 +16,7 @@
 #include <cstdint>
 #include <optional>
 #include <string>
+#include <unordered_map>
 #include <variant>
 #include <vector>
 
@@ -42,18 +43,15 @@ namespace utils {
         enum class TYPE
         {
             STRING,
-            INT,
+            BOOL,
             INT8,
             INT16,
             INT32,
             INT64,
-            LONG,
-            UINT,
             UINT8,
             UINT16,
             UINT32,
             UINT64,
-            ULONG,
             FLOAT,
             DOUBLE,
             LONG_DOUBLE,
@@ -68,7 +66,7 @@ namespace utils {
          * assignment and retrieval using templates to ensure type safety.
          */
         struct ArgumentType {
-            using argValue_t = std::variant<std::string, std::int8_t, std::int16_t, std::int32_t, std::int64_t,
+            using argValue_t = std::variant<std::string, bool, std::int8_t, std::int16_t, std::int32_t, std::int64_t,
                     std::uint8_t, std::uint16_t, std::uint32_t, std::uint64_t, float, double, long double>;
 
             /**
@@ -91,8 +89,20 @@ namespace utils {
                     if (auto* ptr = std::get_if<std::int64_t>(&value)) {
                         return static_cast<T>(*ptr);
                     }
+                } else if constexpr (std::is_same_v<T, long long>) {
+                    if (auto* ptr = std::get_if<std::int64_t>(&value)) {
+                        return static_cast<T>(*ptr);
+                    }
                 } else if constexpr (std::is_same_v<T, unsigned long>) {
                     if (auto* ptr = std::get_if<std::uint64_t>(&value)) {
+                        return static_cast<T>(*ptr);
+                    }
+                } else if constexpr (std::is_same_v<T, unsigned long long>) {
+                    if (auto* ptr = std::get_if<std::uint64_t>(&value)) {
+                        return static_cast<T>(*ptr);
+                    }
+                } else if constexpr (std::is_same_v<T, bool>) {
+                    if (auto* ptr = std::get_if<bool>(&value)) {
                         return static_cast<T>(*ptr);
                     }
                 } else {
@@ -181,14 +191,74 @@ namespace utils {
 
             // TODO: add all the types
 
-            // bool getBool(const std::string& name, bool defaultValue = false) const {
-            //     if (auto val = getValue<bool>(name))
-            //         return *val;
-            //     return defaultValue;
-            // }
+            bool getBool(const std::string& name, bool defaultValue = false) const {
+                if (auto val = getValue<bool>(name))
+                    return *val;
+                return defaultValue;
+            }
 
-            int getInt(const std::string& name, int defaultValue = 0) const {
-                if (auto val = getValue<int>(name))
+            std::int8_t getInt8(const std::string& name, std::int8_t defaultValue = 0) const {
+                if (auto val = getValue<std::int8_t>(name))
+                    return *val;
+                return defaultValue;
+            }
+
+            std::int16_t getInt16(const std::string& name, std::int16_t defaultValue = 0) const {
+                if (auto val = getValue<std::int16_t>(name))
+                    return *val;
+                return defaultValue;
+            }
+
+            std::int32_t getInt32(const std::string& name, std::int32_t defaultValue = 0) const {
+                if (auto val = getValue<std::int32_t>(name))
+                    return *val;
+                return defaultValue;
+            }
+
+            std::int64_t getInt64(const std::string& name, std::int64_t defaultValue = 0) const {
+                if (auto val = getValue<std::int64_t>(name))
+                    return *val;
+                return defaultValue;
+            }
+
+            std::uint8_t getUInt8(const std::string& name, std::uint8_t defaultValue = 0) const {
+                if (auto val = getValue<std::uint8_t>(name))
+                    return *val;
+                return defaultValue;
+            }
+
+            std::uint16_t getUInt16(const std::string& name, std::uint16_t defaultValue = 0) const {
+                if (auto val = getValue<std::uint16_t>(name))
+                    return *val;
+                return defaultValue;
+            }
+
+            std::uint32_t getUInt32(const std::string& name, std::uint32_t defaultValue = 0) const {
+                if (auto val = getValue<std::uint32_t>(name))
+                    return *val;
+                return defaultValue;
+            }
+
+            std::uint64_t getUInt64(const std::string& name, std::uint64_t defaultValue = 0) const {
+                if (auto val = getValue<std::uint64_t>(name))
+                    return *val;
+                return defaultValue;
+            }
+
+            float getFloat(const std::string& name, float defaultValue = 0.0f) const {
+                if (auto val = getValue<float>(name))
+                    return *val;
+                return defaultValue;
+            }
+
+            double getDouble(const std::string& name, double defaultValue = 0.0) const {
+                if (auto val = getValue<double>(name))
+                    return *val;
+                return defaultValue;
+            }
+
+            long double getLongDouble(const std::string& name, long double defaultValue = 0.0) const {
+                if (auto val = getValue<long double>(name))
                     return *val;
                 return defaultValue;
             }
@@ -249,26 +319,45 @@ namespace utils {
         ArgParser& addArgument(std::string_view name, bool isRequired, bool isFlag, std::string_view description,
             TYPE type);
 
+        template<typename T>
+        ArgParser& add(const std::string& name, bool required = true,
+               const std::string& help = "", T defaultValue = T{}) {
+            TYPE type = getTypeEnum<T>();
+            addArgument(name, required, false, help, type);
+            // Store default value if needed
+            if (!required) {
+                auto& arg = mUserSpecifiedArguments.back();
+                arg.value = defaultValue;
+            }
+            return *this;
+        }
+
         ArgParser& addString(const std::string& name, bool required = true, const std::string& help = "",
             const std::string& defaultValue = "");
 
-        // TODO: add addInt, and others....
-
-        template<typename... Args>
-        auto parseAndApply(int argc, char** argv, Args&&... argNames) {
-            auto result = parse(argc, argv);
-
-            using TupleType = decltype(std::make_tuple(result->getString(argNames)...));
-            using ReturnType = returns::expected<TupleType, returns::ParseError>;
-
-            if (!result) {
-                return ReturnType(returns::unexpected(result.error()));
-            }
-
-            return ReturnType(std::make_tuple(result->getString(std::forward<Args>(argNames))...));
-        }
-
     private:
+        template<typename T>
+        struct always_false : std::false_type {};
+
+        template<typename T>
+        static TYPE getTypeEnum() {
+            if constexpr (std::is_same_v<T, std::string>) return TYPE::STRING;
+            else if constexpr (std::is_same_v<T, bool>) return TYPE::BOOL;
+            else if constexpr (std::is_same_v<T, std::int8_t>) return TYPE::INT8;
+            else if constexpr (std::is_same_v<T, std::int16_t>) return TYPE::INT16;
+            else if constexpr (std::is_same_v<T, std::int32_t>) return TYPE::INT32;
+            else if constexpr (std::is_same_v<T, std::int64_t>) return TYPE::INT64;
+            else if constexpr (std::is_same_v<T, std::uint8_t>) return TYPE::UINT8;
+            else if constexpr (std::is_same_v<T, std::uint16_t>) return TYPE::UINT16;
+            else if constexpr (std::is_same_v<T, std::uint32_t>) return TYPE::UINT32;
+            else if constexpr (std::is_same_v<T, std::uint64_t>) return TYPE::UINT64;
+            else if constexpr (std::is_same_v<T, float>) return TYPE::FLOAT;
+            else if constexpr (std::is_same_v<T, double>) return TYPE::DOUBLE;
+            else if constexpr (std::is_same_v<T, long double>) return TYPE::LONG_DOUBLE;
+            else {
+                static_assert(always_false<T>::value, "Unsupported type");
+            }
+        }
         /**
          * @brief Parses the command-line arguments.
          *
@@ -308,7 +397,7 @@ namespace utils {
          * @param argument The argument currently being processed.
          * @return True if the value looks like a flag/option, False otherwise.
          */
-        static bool looksLikeAFlag(std::vector<std::string>::const_iterator &iterator, Argument &argument);
+        static bool looksLikeAFlag(const std::vector<std::string>::const_iterator &iterator, const Argument &argument);
 
         std::uint32_t mArgumentCount{0};
         std::vector<std::string> mOriginalArguments;

@@ -34,4 +34,8 @@ add_executable(BinaryFileViewer
                Utils/Threads/DeferredJoinableThread.h
                Application/ApplicationBase.cpp
                Application/ApplicationBase.h
+               Files/BinaryFile.cpp
+               Files/BinaryFile.h
+               Files/BinaryFileConverter.cpp
+               Files/BinaryFileConverter.h
 )
