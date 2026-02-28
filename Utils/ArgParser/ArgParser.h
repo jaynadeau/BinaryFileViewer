@@ -177,7 +177,7 @@ namespace utils {
         using ExpectedNamedArguments = returns::expected<NamedArguments, returns::ParseError>;
         using ExpectedArgument = returns::expected<Argument, returns::ParseError>;
 
-        // New: Result type with clean accessors
+        // Result type with clean accessors
         class ParseResult {
         public:
             explicit ParseResult(NamedArguments args) : args(std::move(args)) {}
@@ -188,8 +188,6 @@ namespace utils {
                     return *val;
                 return defaultValue;
             }
-
-            // TODO: add all the types
 
             bool getBool(const std::string& name, bool defaultValue = false) const {
                 if (auto val = getValue<bool>(name))
