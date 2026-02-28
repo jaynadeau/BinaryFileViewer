@@ -5,6 +5,8 @@
 #ifndef FILES_IFILE_H
 #define FILES_IFILE_H
 
+#include <string_view>
+
 namespace files {
 
     class IFile {

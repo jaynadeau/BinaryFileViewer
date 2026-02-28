@@ -36,8 +36,8 @@ BinaryFileConverter::BinaryFileConverter(std::string_view type)
 void BinaryFileConverter::convert(const std::vector<unsigned char>& data) const {
     switch (mType) {
         case DataType::UINT8: {
-            const std::uint8_t* typedData = reinterpret_cast<const std::uint8_t*>(data.data());
-            size_t count = data.size() / sizeof(std::uint8_t);
+            const auto*typedData = data.data();
+            const size_t count = data.size() / sizeof(std::uint8_t);
             std::cout << "UINT8 (" << count << " elements): ";
             for (size_t i = 0; i < count; ++i) {
                 std::cout << static_cast<int>(typedData[i]) << " ";
@@ -46,8 +46,8 @@ void BinaryFileConverter::convert(const std::vector<unsigned char>& data) const 
             break;
         }
         case DataType::UINT16: {
-            const std::uint16_t* typedData = reinterpret_cast<const std::uint16_t*>(data.data());
-            size_t count = data.size() / sizeof(std::uint16_t);
+            const auto* typedData = reinterpret_cast<const std::uint16_t*>(data.data());
+            const size_t count = data.size() / sizeof(std::uint16_t);
             std::cout << "UINT16 (" << count << " elements): ";
             for (size_t i = 0; i < count; ++i) {
                 std::cout << typedData[i] << " ";
@@ -56,8 +56,8 @@ void BinaryFileConverter::convert(const std::vector<unsigned char>& data) const 
             break;
         }
         case DataType::UINT32: {
-            const std::uint32_t* typedData = reinterpret_cast<const std::uint32_t*>(data.data());
-            size_t count = data.size() / sizeof(std::uint32_t);
+            const auto* typedData = reinterpret_cast<const std::uint32_t*>(data.data());
+            const size_t count = data.size() / sizeof(std::uint32_t);
             std::cout << "UINT32 (" << count << " elements): ";
             for (size_t i = 0; i < count; ++i) {
                 std::cout << typedData[i] << " ";
@@ -66,8 +66,8 @@ void BinaryFileConverter::convert(const std::vector<unsigned char>& data) const 
             break;
         }
         case DataType::INT8: {
-            const std::int8_t* typedData = reinterpret_cast<const std::int8_t*>(data.data());
-            size_t count = data.size() / sizeof(std::int8_t);
+            const auto* typedData = reinterpret_cast<const std::int8_t*>(data.data());
+            const size_t count = data.size() / sizeof(std::int8_t);
             std::cout << "INT8 (" << count << " elements): ";
             for (size_t i = 0; i < count; ++i) {
                 std::cout << static_cast<int>(typedData[i]) << " ";
@@ -76,8 +76,8 @@ void BinaryFileConverter::convert(const std::vector<unsigned char>& data) const 
             break;
         }
         case DataType::INT16: {
-            const std::int16_t* typedData = reinterpret_cast<const std::int16_t*>(data.data());
-            size_t count = data.size() / sizeof(std::int16_t);
+            const auto* typedData = reinterpret_cast<const std::int16_t*>(data.data());
+            const size_t count = data.size() / sizeof(std::int16_t);
             std::cout << "INT16 (" << count << " elements): ";
             for (size_t i = 0; i < count; ++i) {
                 std::cout << typedData[i] << " ";
@@ -86,8 +86,8 @@ void BinaryFileConverter::convert(const std::vector<unsigned char>& data) const 
             break;
         }
         case DataType::INT32: {
-            const std::int32_t* typedData = reinterpret_cast<const std::int32_t*>(data.data());
-            size_t count = data.size() / sizeof(std::int32_t);
+            const auto* typedData = reinterpret_cast<const std::int32_t*>(data.data());
+            const size_t count = data.size() / sizeof(std::int32_t);
             std::cout << "INT32 (" << count << " elements): ";
             for (size_t i = 0; i < count; ++i) {
                 std::cout << typedData[i] << " ";
@@ -96,8 +96,8 @@ void BinaryFileConverter::convert(const std::vector<unsigned char>& data) const 
             break;
         }
         case DataType::FLOAT: {
-            const float* typedData = reinterpret_cast<const float*>(data.data());
-            size_t count = data.size() / sizeof(float);
+            const auto* typedData = reinterpret_cast<const float*>(data.data());
+            const size_t count = data.size() / sizeof(float);
             std::cout << "Float (" << count << " elements): ";
             for (size_t i = 0; i < count; ++i) {
                 std::cout << typedData[i] << " ";
@@ -106,8 +106,8 @@ void BinaryFileConverter::convert(const std::vector<unsigned char>& data) const 
             break;
         }
         case DataType::DOUBLE: {
-            const double* typedData = reinterpret_cast<const double*>(data.data());
-            size_t count = data.size() / sizeof(double);
+            const auto* typedData = reinterpret_cast<const double*>(data.data());
+            const size_t count = data.size() / sizeof(double);
             std::cout << "Double (" << count << " elements): ";
             for (size_t i = 0; i < count; ++i) {
                 std::cout << typedData[i] << " ";
@@ -117,8 +117,8 @@ void BinaryFileConverter::convert(const std::vector<unsigned char>& data) const 
         }
         case DataType::INT64:
         {
-            const std::int64_t* typedData = reinterpret_cast<const std::int64_t*>(data.data());
-            size_t count = data.size() / sizeof(std::int64_t);
+            const auto* typedData = reinterpret_cast<const std::int64_t*>(data.data());
+            const size_t count = data.size() / sizeof(std::int64_t);
             std::cout << "Int64 (" << count << " elements): ";
             for (size_t i = 0; i < count; ++i) {
                 std::cout << typedData[i] << " ";
@@ -128,8 +128,8 @@ void BinaryFileConverter::convert(const std::vector<unsigned char>& data) const 
         }
         case DataType::UINT64:
         {
-            const std::uint64_t* typedData = reinterpret_cast<const std::uint64_t*>(data.data());
-            size_t count = data.size() / sizeof(std::uint64_t);
+            const auto* typedData = reinterpret_cast<const std::uint64_t*>(data.data());
+            const size_t count = data.size() / sizeof(std::uint64_t);
             std::cout << "UInt64 (" << count << " elements): ";
             for (size_t i = 0; i < count; ++i) {
                 std::cout << typedData[i] << " ";
@@ -139,8 +139,8 @@ void BinaryFileConverter::convert(const std::vector<unsigned char>& data) const 
         }
         case DataType::LONG_DOUBLE:
         {
-            const long double* typedData = reinterpret_cast<const long double*>(data.data());
-            size_t count = data.size() / sizeof(long double);
+            const auto* typedData = reinterpret_cast<const long double*>(data.data());
+            const size_t count = data.size() / sizeof(long double);
             std::cout << "LongDouble (" << count << " elements): ";
             for (size_t i = 0; i < count; ++i) {
                 std::cout << typedData[i] << " ";
