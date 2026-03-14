@@ -56,7 +56,7 @@ namespace bfv {
 
             // open input file in binary mode
             files::BinaryFile file{mInputFilename};
-            // convert the type to the specified type
+            // convert the file to the specified type
             files::BinaryFileConverter converter{mOutputType};
             converter.convert(file.getData());
 
